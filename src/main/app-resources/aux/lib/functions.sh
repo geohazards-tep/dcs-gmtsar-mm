@@ -1,4 +1,8 @@
 # define the exit codes
+
+set -x
+
+
 SUCCESS=0
 ERR_NOMASTER=20
 ERR_NOSTARTDATE=30
@@ -45,7 +49,7 @@ function getAUXref() {
 function getASARAuxOrbList() {
 
   local sar=$1
-  local osd=$2  
+  local osd="https://catalog.terradue.com/envisat/search"  
 
   for aux in ASA_CON_AX ASA_INS_AX ASA_XCA_AX ASA_XCH_AX
   do
@@ -67,7 +71,29 @@ function getASARAuxOrbList() {
   # DOR_VOR_AX
   ciop-log "INFO" "Getting a reference to DOR_VOR_AX"
   ref=$( getAUXref ${sar} ${osd} DOR_VOR_AX )
-  [ -z "${ref}" ] && return ${ERR_VOR} || echo "vor=${ref}"    
+  [ -z "${ref}" ] && return ${ERR_VOR} || echo "orb=${ref}"    
+
+}
+
+function getS1AuxOrbList() {
+
+  local sar=$1
+  local platform=$2
+  local osd="https://catalog.terradue.com/sentinel1-aux/search"
+
+  # Precise orbit data - Sentinel-1
+  ciop-log "INFO" "Getting a reference to Sentinel ${platform} precise orbit data"
+
+  startdate=$( opensearch-client ${sar} startdate | tr -d "Z")
+  [ -z "${startdate}" ] && return ${ERR_NOSTARTDATE}
+
+  stopdate=$( opensearch-client ${sar} enddate | tr -d "Z")
+  [ -z "${stopdate}" ] && return ${ERR_NOENDDATE}
+
+  ref="$( opensearch-client -p "psn=${platform}" -p "time:start=${startdate}" -p "time:end=${stopdate}" ${osd} )"
+  [ -z "${ref}" ] && return ${ERR_AUXREF}
+
+  echo "orb=${ref}"
 
 }
 
@@ -75,69 +101,69 @@ function getAuxOrbList() {
 
   # generic function to retrieve aux data 
   
-  local master=$1
-  local identifier
+  local sar=$1
+  local platform
 
-  identifier=$( opensearch-client ${master} identifier )
-  [ -z "${identifier}" ] && return ${ERR_MASTER_IDENTIFIER}
-
+  platform=$( opensearch-client -m EOP ${sar} platform )
+  [ -z "${platform}" ] && return ${ERR_SAR_PLATFORM}
   
-  # get the EOP metadata
-  opensearch-client \
-    -m EOP \
-    -f atom \
-    ${master} \
-    {} | xmllint --format - > ${TMPDIR}/identifier.eop 
+  case ${platform} in 
+    "ENVISAT")
+      aux="$( getASARAuxOrbList ${sar} )"
+      [ -z "${aux}" ] && return ${ERR_ASAR_AUX}
+      ;;
+    "S1A")
+      aux="$( getS1AuxOrbList ${sar} S1A )"
+      [ -z "${aux}" ] && return ${ERR_S1A_AUX}
+      ;;
+    "S1B")
+      aux="$( getS1AuxOrbList ${sar} S1B )"
+      [ -z "${aux}" ] && return ${ERR_S1B_AUX}
+      ;;
+    *)
+      aux=""
+      ;;
+  esac
 
-  
-
-  rm -f ${TMPDIR}/identifier.eop
- 
-  # get the product type to invoke the correct function
-
-
+  echo "series=${platform}"
+  echo ${aux}
 
 }
 
 
 function main() {
 
-  # get the catalogue access point
-  osd="$( ciop-getparam aux_catalogue )"
-
   # Get the master - it's always the same
   local master="$( ciop-getparam Level0_ref )"
   
-  [ -z "$master" ] && return $ERR_NOMASTER 
+  [ -z "${master}" ] && return $ERR_NOMASTER 
 
-  ciop-log "INFO" "master is: $master"
+  ciop-log "INFO" "master is: ${master}"
 
   # create the first line of the joborder with the reference
   # to the ASAR master product 
-  echo "master="$master"" > $TMPDIR/joborder
+  echo "master=${master}" > $TMPDIR/joborder
 
-  getAuxOrbList $master >> $TMPDIR/joborder
+  getAuxOrbList ${master} >> $TMPDIR/joborder
+  res=$?
+  [ ${res} -ne 0 ] && return ${res}
+
+  cat > ${TMPDIR}/slave
+ 
+  slave=$(cat ${TMPDIR}/slave)
+  rm -f ${TMPDIR}/slave
+  
+  ciop-log "INFO" "slave is: ${slave}"
+  
+  echo "slave="$slave"" >> $TMPDIR/joborder
+
+  getAuxOrbList ${slave} >> $TMPDIR/joborder
   res=$?
   [ $res -ne 0 ] && return $res
-
-  # loop through all slaves
-  i=0
-  while read slave 
-  do
-    ciop-log "INFO" "slave is: $slave"
-    cp $TMPDIR/joborder $TMPDIR/joborder_${i}.tmp
-    echo "slave="$slave"" >> $TMPDIR/joborder_${i}.tmp
-
-    getAuxOrbList $slave $osd >> $TMPDIR/joborder_${i}.tmp
-    res=$?
-    [ $res -ne 0 ] && return $res
-  
-    sort -u $TMPDIR/joborder_${i}.tmp > $TMPDIR/joborder_${i}
-    
-    ciop-publish $TMPDIR/joborder_${i}  
    
-    rm -f $TMPDIR/joborder_${i}.tmp $TMPDIR/joborder_${i}
-    i=$((i+1))
-  done
+  sort -u $TMPDIR/joborder > $TMPDIR/joborder.tmp
+  mv $TMPDIR/joborder.tmp $TMPDIR/joborder
+
+  ciop-publish $TMPDIR/joborder  
 
 }
