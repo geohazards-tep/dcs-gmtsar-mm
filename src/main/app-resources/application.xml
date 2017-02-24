@@ -5,7 +5,7 @@
       <streamingExecutable>/application/aux/run</streamingExecutable>
       <defaultParameters>
       <!--  <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100328_175019_000000162088_00084_42222_9504.N1</parameter> -->
-        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20151105T163133_20151105T163201_008472_00BFA6_D862</parameter>
+        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170201T222518_20170201T222548_015096_018ADF_4A08</parameter>
       </defaultParameters>
         <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
@@ -39,10 +39,10 @@
       <job id="aux"/>
       <sources>
        <!-- <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100502_175016_000000172089_00084_42723_0354.N1</source>-->
-	<source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20151117T163127_20151117T163155_008647_00C499_5DC1</source>
+	<source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170120T222521_20170120T222534_014921_01859A_D0D1</source>
       </sources>
       <parameters>
-        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20151105T163133_20151105T163201_008472_00BFA6_D862</parameter>
+        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170201T222518_20170201T222548_015096_018ADF_4A08</parameter>
       </parameters>
     </node>
     <node id="node_dem">
