@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# source the ciop functions (e.g. ciop-log)
+source ${ciop_job_include}
+
+source ${_CIOP_APPLICATION_PATH}/aux/lib/functions.sh
+
+cat | main || exit $?
