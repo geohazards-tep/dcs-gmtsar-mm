@@ -80,6 +80,7 @@ function getS1AuxOrbList() {
   local sar=$1
   local platform=$2
   local osd="https://catalog.terradue.com/sentinel1-aux/search"
+  local refs
 
   # Precise orbit data - Sentinel-1
   ciop-log "INFO" "Getting a reference to Sentinel ${platform} precise orbit data"
@@ -90,10 +91,13 @@ function getS1AuxOrbList() {
   stopdate=$( opensearch-client ${sar} enddate | tr -d "Z")
   [ -z "${stopdate}" ] && return ${ERR_NOENDDATE}
 
-  ref="$( opensearch-client -p "psn=${platform}" -p "time:start=${startdate}" -p "time:end=${stopdate}" ${osd} )"
-  [ -z "${ref}" ] && return ${ERR_AUXREF}
+  refs="$( opensearch-client -p "psn=${platform}" -p "time:start=${startdate}" -p "time:end=${stopdate}" ${osd} )"
+  [ -z "${refs}" ] && return ${ERR_AUXREF}
 
-  echo "orb=${ref}"
+  for ref in ${refs}
+  do 
+    echo -e "orb=${ref}"
+  done
 
 }
 
@@ -126,7 +130,7 @@ function getAuxOrbList() {
   esac
 
   echo "series=${platform}"
-  echo ${aux}
+  echo ${aux} | tr " " "\n"
 
 }
 
