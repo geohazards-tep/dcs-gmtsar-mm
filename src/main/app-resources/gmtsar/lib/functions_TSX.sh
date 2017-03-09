@@ -9,8 +9,11 @@ function get_aux_TSX() {
 
 function make_slc_TSX() {
 
-  local sar_date=$1
-  
+  local sar_ref=$1
+  local sar_date
+
+  sar_date=$( opensearch-client "${sar_ref}" startdate | cut -c 1-10 | tr -d "-" )
+
   cd ${TMPDIR}/runtime/raw
   cd $( dirname $( find . -name "*${sar_date}*.xml" ))
   make_slc_tsx $( find . -name "*${sar_date}*.xml" ) $( find IMAGEDATA -name "*.cos" ) TSX${sar_date}
@@ -29,25 +32,24 @@ function prep_data_TSX() {
   
   master_ref=$( get_value ${joborder} "master" )   
   slave_ref=$( get_value ${joborder} "slave" )   
+ 
+  # resolve the online resources 
+  master_or="$( opensearch-client -p do=other ${master_ref} enclosure )" 
+  slave_or="$( opensearch-client -p do=other ${slave_ref} enclosure )"
   
-  master_identifier=$( opensearch-client ${master_ref} identifier )
-  slave_identifier=$( opensearch-client ${slave_ref} identifier )
-  
-  master_or="$( opensearch-client -p do=va4 ${master_ref} enclosure )" 
-  slave_or="$( opensearch-client -p do=va4 ${slave_ref} enclosure )"
-  
-  master=$( ciop-copy -O ${TMPDIR}/runtime/raw ${master_or} )
-  slave=$( ciop-copy -O ${TMPDIR}/runtime/raw ${slave_or} )
+  # stage-in the data
+  master=$( ciop-copy -U -O ${TMPDIR}/runtime/raw ${master_or} )
+  slave=$( ciop-copy -U -O ${TMPDIR}/runtime/raw ${slave_or} )
+
+  # extract data
+  tar xvzf ${master}
+  tar xvzf ${slave}
 
   # pre-process master
-  master_date=$( opensearch-client "${master_ref}" startdate | cut -c 1-10 | tr -d "-" ) 
-  
-  make_slc_TSX ${master_date}
+  make_slc_TSX ${master_ref}
   
   # pre-process slave
-  slave_date=$( opensearch-client "${slave_ref}" startdate | cut -c 1-10 | tr -d "-" ) 
-  
-  make_slc_TSX ${slave_date}
+  make_slc_TSX ${slave_ref}
   
 }
 

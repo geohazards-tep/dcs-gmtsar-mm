@@ -23,7 +23,7 @@ function get_value() {
   
   value=$( cat ${joborder} | grep "^${key}=" | cut -d "=" -f 2- )
 
-  echo ${key}
+  echo ${value}
 
 }
 
@@ -61,6 +61,8 @@ function gmtsar_env() {
 
 function get_aux() {
 
+  local joborder=$1  
+
   series=$( get_value ${joborder} "series" )
 
   eval get_aux_${series} ${joborder} || return ${ERR_GET_AUX}
@@ -70,22 +72,7 @@ function get_aux() {
 function prep_data() {
 
   local joborder=$1
-  local master_ref
-  local slave_ref
   local series
-  
-  master_ref=$( get_value ${joborder} "master" )   
-  slave_ref=$( get_value ${joborder} "slave" )   
-  
-  for ref in ${master_ref} ${slave_ref}
-  do 
-    ciop-log "INFO" "Retrieve ${ref}"
-     
-    local_ref=$( ciop-copy -O ${TMPDIR}/runtime/orig ${ref} )  
-    
-    [ ! -e "${local_ref}" ] && return ${ERR_GET_DATA}
-       
-  done
   
   series=$( get_series ${joborder} )
 
@@ -106,7 +93,7 @@ function process() {
   local series
   local joborder=$1
 
-  series=$( get_series ) || return $?
+  series=$( get_series ${joborder} ) || return $?
 
   eval process_${series} || return $?
 
@@ -147,21 +134,27 @@ function publish() {
 }
 
 function main() {
+
+  set -x
   
   source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_S1.sh
   source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_TSX.sh
   source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ALOS2.sh
   source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ENVISAT.sh
   
-  local joborder_ref=$1
-  
-  ciop-log "INFO" "processing input: ${joborder_ref}"
-  
+  local joborder_ref
+
   export TMPDIR=/tmp/$( uuidgen )
   mkdir -p ${TMPDIR}
-  
+
   cd ${TMPDIR}
-  
+
+  joborder_ref="$( cat )"
+  joborder_ref="$( echo ${joborder_ref} | tr " " "\n" | grep joborder )"
+
+
+  ciop-log "INFO" "processing input: ${joborder_ref}"
+ 
   joborder=$( ciop-copy ${joborder_ref} )
 
   gmtsar_env ${joborder}

@@ -107,8 +107,18 @@ function getAuxOrbList() {
   
   local sar=$1
   local platform
+  local identifier
 
   platform=$( opensearch-client -m EOP ${sar} platform )
+
+  [ -z "${platform}" ] && {
+    # handle missing metadata
+    identifier=$( opensearch-client -m EOP ${sar} identifier )
+  
+    # check for TSX
+    [ "$( echo ${identifier} | cut -c 1-3 )" == "TSX" ] && platform="TSX"  
+
+  } 
   [ -z "${platform}" ] && return ${ERR_SAR_PLATFORM}
   
   case ${platform} in 
@@ -151,23 +161,20 @@ function main() {
   getAuxOrbList ${master} >> $TMPDIR/joborder
   res=$?
   [ ${res} -ne 0 ] && return ${res}
-
-  cat > ${TMPDIR}/slave
  
-  slave=$(cat ${TMPDIR}/slave)
-  rm -f ${TMPDIR}/slave
+  slave="$( cat )" 
   
   ciop-log "INFO" "slave is: ${slave}"
   
-  echo "slave="$slave"" >> $TMPDIR/joborder
+  echo "slave=${slave}" >> ${TMPDIR}/joborder
 
-  getAuxOrbList ${slave} >> $TMPDIR/joborder
+  getAuxOrbList ${slave} >> ${TMPDIR}/joborder
   res=$?
-  [ $res -ne 0 ] && return $res
+  [ ${res} -ne 0 ] && return ${res}
    
-  sort -u $TMPDIR/joborder > $TMPDIR/joborder.tmp
-  mv $TMPDIR/joborder.tmp $TMPDIR/joborder
+  sort -u ${TMPDIR}/joborder > ${TMPDIR}/joborder.tmp
+  mv ${TMPDIR}/joborder.tmp ${TMPDIR}/joborder
 
-  ciop-publish $TMPDIR/joborder  
+  ciop-publish ${TMPDIR}/joborder  
 
 }
