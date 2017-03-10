@@ -63,11 +63,11 @@ function process_ENVI() {
 
   series=$( get_series ${joborder} )
   
-  master_ref=$( get_value ${joborder} "master" )   
-  slave_ref=$( get_value ${joborder} "slave" )
+  #master_ref=$( get_value ${joborder} "master" )   
+  #slave_ref=$( get_value ${joborder} "slave" )
   
-  master_date=$( opensearch-client "${master_ref}" startdate | cut -c 1-10 | tr -d "-" )
-  slave_date=$( opensearch-client "${slave_ref}" startdate | cut -c 1-10 | tr -d "-" )
+  #master_date=$( opensearch-client "${master_ref}" startdate | cut -c 1-10 | tr -d "-" )
+  #slave_date=$( opensearch-client "${slave_ref}" startdate | cut -c 1-10 | tr -d "-" )
 
   ciop-log "INFO" "Process p2p ${series}"
   cd ${TMPDIR}/runtime
