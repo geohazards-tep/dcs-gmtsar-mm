@@ -67,5 +67,48 @@
         </plugins>
       </build>
     </profile>
+     <profile>
+      <id>install-and-test</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>sandbox</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.6</version>
+            <executions>
+              <execution>
+                <id>copy-app-resources</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>/application</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${basedir}/src/main/app-resources/</directory>
+                       <excludes>
+                    	<exclude>**/application*.xml</exclude>
+                  	</excludes>
+                    </resource>
+                    <resource>
+                      <directory>${basedir}/src/main/app-resources/</directory>
+                       <includes>
+                    	<include>**/application${mission}.xml</include>
+                  	</includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
