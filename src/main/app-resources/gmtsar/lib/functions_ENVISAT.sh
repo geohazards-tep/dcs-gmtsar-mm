@@ -1,7 +1,10 @@
-function env_ENVI() {
+function env_ENVISAT() {
 
   ciop-log "INFO" "Extending environment for ENVISAT ASAR"
-  
+ 
+  export ENVIPRE=${GMTSARHOME}/ENVISAT_preproc
+  export PATH=${PATH}:${GMTSARHOME}/ENVISAT_preproc/bin/:${GMTSARHOME}/ENVISAT_preproc/csh
+ 
   mkdir -p ${TMPDIR}/aux/ENVI/ASA_INS
   mkdir -p ${TMPDIR}/aux/ENVI/Doris
 
@@ -10,11 +13,11 @@ function env_ENVI() {
 }
 
 
-function get_aux_ENVI() {
+function get_aux_ENVISAT() {
   
   local joborder=$1
 
-  for doris in $( cat ${joborder} | sort -u | grep "^.or=" | cut -d "=" -f 2- )
+  for doris in $( cat ${joborder} | sort -u | grep "^orb=" | cut -d "=" -f 2- )
   do
     enclosure=$( opensearch-client ${doris} enclosure )
     ciop-copy -O ${TMPDIR}/aux/ENVI/Doris ${enclosure}
@@ -34,7 +37,7 @@ function get_aux_ENVI() {
 
 }
 
-function prep_data_ENVI() {
+function prep_data_ENVISAT() {
   
   local joborder=$1
   
@@ -57,7 +60,7 @@ function prep_data_ENVI() {
 
 }
 
-function process_ENVI() {
+function process_ENVISAT() {
 
   local joborder=$1
 
@@ -72,7 +75,7 @@ function process_ENVI() {
   ciop-log "INFO" "Process p2p ${series}"
   cd ${TMPDIR}/runtime
   
-  csh ${_CIOP_APPLICATION_PATH}/gmtsar/libexec/run_ENVI.csh & #> $TMPDIR/runtime/${series}_${master_date}_${slave_date}.log &
+  csh -x ${_CIOP_APPLICATION_PATH}/gmtsar/libexec/run_envi.csh & #> $TMPDIR/runtime/${series}_${master_date}_${slave_date}.log &
   wait ${!}	
 
 }

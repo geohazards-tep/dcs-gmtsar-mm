@@ -11,7 +11,7 @@
         <property id="mapred.task.timeout">7200000</property>
       </defaultJobconf>
     </jobTemplate>
-    <jobTemplate id="dem">
+    <jobTemplate id="dem" jobType="wps_client">
     <defaultParameters>
         <parameter id="format">gmtsar</parameter>
       </defaultParameters>
