@@ -17,6 +17,7 @@
     <description>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</description>
     <community>geohazards-tep</community>
     <yumRepo>geohazards-tep</yumRepo>
+    <mission/>
   </properties>
   <scm>
     <connection>scm:git:ssh://git@github.com/geohazards-tep/dcs-gmtsar-mm</connection>
@@ -45,6 +46,16 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
+                <mappings combine.children="append">
+                    <mapping>
+                      <directory>/application/application.xml</directory>
+                      <sources>
+                        <source>
+                          <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
+                        </source>
+                      </sources>
+                    </mapping>
+                  </mappings>
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
                   <requires>
                     <require>bash</require>
