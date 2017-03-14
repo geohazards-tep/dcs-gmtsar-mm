@@ -57,13 +57,13 @@ function gmtsar_env() {
 
   series=$( get_series ${joborder} )
 
-  export OS=$( uname -p )
-  export GMTHOME=/usr
-  export NETCDFHOME=/usr
-  export GMTSARHOME=/usr/local/GMTSAR
-  export GMTSAR=${GMTSARHOME}/gmtsar
+  #export OS=$( uname -p )
+  #export GMTHOME=/usr
+  #export NETCDFHOME=/usr
+  #export GMTSARHOME=/usr/local/GMTSAR
+  #export GMTSAR=${GMTSARHOME}/gmtsar
 
-  export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${PATH}
+  #export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${PATH}
 
   eval env_${series} ${joborder} || return ${ERR_ENV}
   
@@ -159,7 +159,7 @@ function publish() {
   cd ${TMPDIR}/runtime/intf
 
   ciop-log "INFO" "publishing results"
-  for myext in png ps gz tiff
+  for myext in png ps gz # tiff <- fix gdal_translate issue
   do
     ciop-publish -b ${TMPDIR}/runtime/intf -m ${mydir}/*.${myext}
   done
