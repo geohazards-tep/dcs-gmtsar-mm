@@ -49,7 +49,7 @@ function get_aux_ENVISAT() {
 	
   # create the list of ASA_INS_AX
   ls ${TMPDIR}/aux/ENVI/ASA_INS/ASA_INS* | sed 's#.*/\(.*\)#\1#g' > ${TMPDIR}/aux/ENVI/ASA_INS/list
-  [ ! -e "${TMPDIR}/aux/ENVI/ASA_INS/list" ] && return ${ERR_ENVISAT_AUX} 
+  [ ! -e "${TMPDIR}/aux/ENVI/ASA_INS/list" ] && return ${ERR_ENVISAT_AUX} || return 0 
   
 }
 
@@ -80,9 +80,6 @@ function prep_data_ENVISAT() {
  
   ln -s ${master} ${TMPDIR}/runtime/raw/master.baq
   ln -s ${slave} ${TMPDIR}/runtime/raw/slave.baq
-
-  [ ! -e "${${TMPDIR}/runtime/raw/master.baq}" ] && return ${ERR_ENVISAT_PREP} 
-  [ ! -e "${${TMPDIR}/runtime/raw/slave.baq}" ] && return ${ERR_ENVISAT_PREP} 
 
 }
 

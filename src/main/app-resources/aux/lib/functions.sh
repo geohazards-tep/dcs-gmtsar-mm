@@ -125,9 +125,10 @@ function getAuxOrbList() {
   [ -z "${platform}" ] && {
     # handle missing metadata
     identifier=$( opensearch-client -m EOP ${sar} identifier )
+    [ -z "${identifier}" ] && return ${ERR_SAR_PLATFORM}
   
     # check for TSX
-    [ "$( echo ${identifier} | cut -c 1-3 )" == "TSX" ] && platform="TSX"  
+    [ "$( echo ${identifier} | cut -c 1-3 )" == "TSX" ] && platform="TSX"
 
   } 
   [ -z "${platform}" ] && return ${ERR_SAR_PLATFORM}
@@ -162,7 +163,7 @@ function check_ref() {
   
   identifier=$( opensearch-client "${ref}" identifier )
   
-  [ -z "${identifier}" ] && return ${ERR_IDENTIFIER}
+  [ -z "${identifier}" ] && return ${ERR_IDENTIFIER} || return 0
 
 }
 
@@ -200,6 +201,8 @@ function main() {
    
   sort -u ${TMPDIR}/joborder > ${TMPDIR}/joborder.tmp
   mv ${TMPDIR}/joborder.tmp ${TMPDIR}/joborder
+
+  # TODO add check on series in joborder
 
   ciop-publish ${TMPDIR}/joborder  
 

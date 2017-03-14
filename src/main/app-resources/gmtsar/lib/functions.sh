@@ -203,6 +203,8 @@ function main() {
  
   joborder=$( ciop-copy ${joborder_ref} )
 
+  [ ! -e "${joborder}" ] && return ${ERR_JOBORDER}
+
   gmtsar_env ${joborder} || return $?
 
   get_dem ${dem_response} || return $?
