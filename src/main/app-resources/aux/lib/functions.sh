@@ -2,12 +2,17 @@
 
 set -x
 
-
 SUCCESS=0
 ERR_NOMASTER=20
 ERR_NOSTARTDATE=30
 ERR_NOENDDATE=40
 ERR_NOAUXREF=50
+ERR_VOR=60
+ERR_SAR_PLATFORM=70
+ERR_ASAR_AUX=80
+ERR_S1A_AUX=90
+ERR_SBA_AUX=100
+ERR_IDENTIFIER=110
 
 # add a trap to exit gracefully
 function cleanExit () {
@@ -15,11 +20,17 @@ function cleanExit () {
    local retval=$?
    local msg=""
    case "$retval" in
-     $SUCCESS)        msg="Processing successfully concluded";;
-     $ERR_NOMASTER)   msg="Master reference not provided";;
-     $ERR_NOSTARTDATE)  msg="Could not retrieve ASAR product start date";;
-     $ERR_NOENDDATE)    msg="Could not retrieve ASAR product end date";;
-     $ERR_NOAUXREF)  msg="Error getting a reference to ASAR auxiliry data";;
+     ${SUCCESS})        msg="Processing successfully concluded";;
+     ${ERR_NOMASTER})   msg="Master reference not provided";;
+     ${ERR_NOSTARTDATE})  msg="Could not retrieve product start date";;
+     ${ERR_NOENDDATE})    msg="Could not retrieve product end date";;
+     ${ERR_NOAUXREF})  msg="Error getting a reference to auxiliary data";;
+     ${ERR_ASAR_AUX})  msg="Error getting a reference to ASAR auxiliary data";;
+     ${ERR_VOR})  	msg="Error getting a reference to ASAR orbital data data";;
+     ${ERR_S1A_AUX})  	msg="Error getting a reference to Sentinel-1A orbital data data";;
+     ${ERR_S1B_AUX})  	msg="Error getting a reference to Sentinel-1B orbital data data";;
+     ${ERR_SAR_PLATFORM})   msg="Could not identify platform";;
+     ${ERR_IDENTIFIER})	msg="Input provided is not in the catalogue";;
      *)               msg="Unknown error";;
    esac
    [ "$retval" != "0" ] && ciop-log "ERROR" "Error $retval - $msg, processing aborted" || ciop-log "INFO" "$msg"
@@ -144,28 +155,43 @@ function getAuxOrbList() {
 
 }
 
+function check_ref() {
+ 
+  local ref=$1
+  local identifier
+  
+  identifier=$( opensearch-client "${ref}" identifier )
+  
+  [ -z "${identifier}" ] && return ${ERR_IDENTIFIER}
+
+}
 
 function main() {
 
   # Get the master - it's always the same
   local master="$( ciop-getparam Level0_ref )"
   
-  [ -z "${master}" ] && return $ERR_NOMASTER 
+  [ -z "${master}" ] && return ${ERR_NOMASTER} 
+
+  check_ref ${master} || return $?
 
   ciop-log "INFO" "master is: ${master}"
 
   # create the first line of the joborder with the reference
-  # to the ASAR master product 
-  echo "master=${master}" > $TMPDIR/joborder
+  # to the master product 
+  echo "master=${master}" > ${TMPDIR}/joborder
 
-  getAuxOrbList ${master} >> $TMPDIR/joborder
+  getAuxOrbList ${master} >> ${TMPDIR}/joborder
   res=$?
   [ ${res} -ne 0 ] && return ${res}
  
+  # slave is passed via stdin
   slave="$( cat )" 
   
-  ciop-log "INFO" "slave is: ${slave}"
+  check_ref ${slave} || return $?
   
+  ciop-log "INFO" "slave is: ${slave}"
+  	
   echo "slave=${slave}" >> ${TMPDIR}/joborder
 
   getAuxOrbList ${slave} >> ${TMPDIR}/joborder

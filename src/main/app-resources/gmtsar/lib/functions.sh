@@ -1,6 +1,17 @@
 
 SUCCESS=0
-ERR_DEM=30
+ERR_ENV=10
+ERR_DEM=20
+ERR_SERIES=30
+ERR_GETAUX=40
+ERR_PREP_DATA=50
+ERR_JOBORDER=60
+ERR_DEMRESPONSE=70
+
+source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_S1.sh
+source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_TSX.sh
+source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ALOS2.sh
+source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ENVISAT.sh
 
 function cleanExit () {
 
@@ -107,7 +118,7 @@ function get_dem() {
 
   # extract the result URL
   curl -L -o ${TMPDIR}/runtime/topo/dem.tgz "${dem_url}" 2> /dev/null
-  [ ! -e ${TMPDIR}/runtime/topo/dem.tgz ] && return ${ERR_NODEM}
+  [ ! -e ${TMPDIR}/runtime/topo/dem.tgz ] && return ${ERR_DEM}
 
   tar xzf ${TMPDIR}/runtime/topo/dem.tgz -C ${TMPDIR}/runtime/topo
 
@@ -126,7 +137,7 @@ function process() {
   local series
   local joborder=$1
 
-  series=$( get_series ${joborder} ) || return $?
+  series=$( get_series ${joborder} ) 
 
   eval process_${series} ${joborder} || return $?
 
@@ -170,10 +181,7 @@ function main() {
 
   set -x
   
-  source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_S1.sh
-  source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_TSX.sh
-  source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ALOS2.sh
-  source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ENVISAT.sh
+
   
   local input
   local joborder_ref
@@ -188,21 +196,23 @@ function main() {
   joborder_ref="$( echo ${input} | tr " " "\n" | grep joborder )"
   dem_response="$( echo ${input} | tr " " "\n" | grep response )"
 
-
+  [ -z {"${joborder_ref}" ] && return ${ERR_JOBORDER}
+  [ -z {"${dem_response}" ] && return ${ERR_DEMRESPONSE} 
+    
   ciop-log "INFO" "processing input: ${joborder_ref}"
  
   joborder=$( ciop-copy ${joborder_ref} )
 
-  gmtsar_env ${joborder}
+  gmtsar_env ${joborder} || return $?
 
   get_dem ${dem_response} || return $?
 
-  get_aux ${joborder}
+  get_aux ${joborder} || return $?
 
-  prep_data ${joborder}
+  prep_data ${joborder} || return $?
 
-  process ${joborder}
+  process ${joborder} || return $?
   
-  publish
+  publish 
 
 }
