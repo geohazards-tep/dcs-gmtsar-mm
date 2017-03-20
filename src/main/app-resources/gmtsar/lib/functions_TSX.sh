@@ -15,13 +15,19 @@ function make_slc_TSX() {
   sar_date=$( opensearch-client "${sar_ref}" startdate | cut -c 1-10 | tr -d "-" )
 
   cd ${TMPDIR}/runtime/raw
-  cd $( dirname $( find . -name "*${sar_date}*.xml" ))
-  make_slc_tsx $( find . -name "*${sar_date}*.xml" ) $( find IMAGEDATA -name "*.cos" ) TSX${sar_date}
-  mv TSX${sar_date}* ${TMPDIR}/runtime/raw
 
-  cd ${TMPDIR}/runtime/raw
-  extend_orbit TSX{sar_date}.LED tmp 3.
-  mv tmp TSX{sar_date}.LED
+  # GMT5SAR code
+  #cd $( dirname $( find . -name "*${sar_date}*.xml" ))
+  #make_slc_tsx $( find . -name "*${sar_date}*.xml" ) $( find IMAGEDATA -name "*.cos" ) TSX${sar_date}
+  #mv TSX${sar_date}* ${TMPDIR}/runtime/raw
+  #
+  #cd ${TMPDIR}/runtime/raw
+  ##make_slc_tsx -idims_op_oc_dfd2_370205611_1/TSX-1.SAR.L1B/TSX1_SAR__SSC______SM_S_SRA_20120615T162057_20120615T162105/TSX1_SAR__SSC______SM_S_SRA_20120615T162057_20120615T162105.xml -pTSX20120615
+  make_slc_tsx -i$( find . -name "*${sar_date}*.xml" ) -pTSX${sar_date}
+
+  tree 
+  extend_orbit TSX${sar_date}.LED tmp 3.
+  mv tmp TSX${sar_date}.LED
   
 }
 
@@ -69,7 +75,7 @@ function process_TSX() {
   
   cd ${TMPDIR}/runtime
   
-  csh ${_CIOP_APPLICATION_PATH}/gmtsar/libexec/run_${series}.csh TSX${master_date} TSX${slave_date}  & #> $TMPDIR/runtime/${series}_${master_date}_${slave_date}.log &
+  csh ${_CIOP_APPLICATION_PATH}/gmtsar/libexec/run_tsx.csh TSX${master_date} TSX${slave_date}  & #> $TMPDIR/runtime/${series}_${master_date}_${slave_date}.log &
   wait ${!}
 
 }

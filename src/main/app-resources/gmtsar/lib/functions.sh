@@ -68,6 +68,7 @@ function gmtsar_env() {
 
   series=$( get_series ${joborder} )
 
+  . /etc/profile.d/gmt4sar.sh
   #export OS=$( uname -p )
   #export GMTHOME=/usr
   #export NETCDFHOME=/usr
