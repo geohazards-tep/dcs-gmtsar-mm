@@ -12,6 +12,7 @@ source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_S1.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_TSX.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ALOS2.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ENVISAT.sh
+source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_RS2.sh
 
 function cleanExit () {
 
