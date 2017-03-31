@@ -69,14 +69,16 @@ function gmtsar_env() {
 
   series=$( get_series ${joborder} )
 
-  . /etc/profile.d/gmt4sar.sh
-  #export OS=$( uname -p )
+  #. /etc/profile.d/gmt4sar.sh
+  . /etc/profile.d/gmt5sar.sh  
   #export GMTHOME=/usr
   #export NETCDFHOME=/usr
   #export GMTSARHOME=/usr/local/GMTSAR
   #export GMTSAR=${GMTSARHOME}/gmtsar
 
   #export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${PATH}
+  export GMTSAR=/usr/local/GMT5SAR
+  export PATH=${GMTSAR}/bin:${PATH}
 
   eval env_${series} ${joborder} || return ${ERR_ENV}
   

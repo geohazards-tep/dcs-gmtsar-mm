@@ -4,7 +4,7 @@
     <jobTemplate id="aux">
       <streamingExecutable>/application/aux/run</streamingExecutable>
       <defaultParameters>
-        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com//noa-radarsat2/search?format=atom&uid=RS2_OK63842_PK605869_DK537627_F23F_20160206_042455_HH_HV_SLC</parameter>
+        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com//noa-radarsat2/search?uid=RS2_OK63842_PK605869_DK537627_F23F_20160206_042455_HH_HV_SLC</parameter>
       </defaultParameters>
         <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
@@ -38,16 +38,16 @@
     <node id="node_aux">
       <job id="aux"/>
       <sources>
-	<source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com//noa-radarsat2/search?format=atom&uid=RS2_OK63842_PK604606_DK536364_F23F_20160113_042457_HH_HV_SLC</source>
+	<source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com//noa-radarsat2/search?uid=RS2_OK63842_PK604606_DK536364_F23F_20160113_042457_HH_HV_SLC</source>
       </sources>
       <parameters>
-        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com//noa-radarsat2/search?format=atom&uid=RS2_OK63842_PK605869_DK537627_F23F_20160206_042455_HH_HV_SLC</parameter>
+        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com//noa-radarsat2/search?uid=RS2_OK63842_PK605869_DK537627_F23F_20160206_042455_HH_HV_SLC</parameter>
       </parameters>
     </node>
     <node id="node_dem">
       <job id="dem"/>
       <sources>
-        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com//noa-radarsat2/search?format=atom&uid=RS2_OK63842_PK605869_DK537627_F23F_20160206_042455_HH_HV_SLC</source>
+        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com//noa-radarsat2/search?uid=RS2_OK63842_PK605869_DK537627_F23F_20160206_042455_HH_HV_SLC</source>
       </sources>
       <parameters/>
     </node>

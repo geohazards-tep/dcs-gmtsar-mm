@@ -146,6 +146,10 @@ function getAuxOrbList() {
       aux="$( getS1AuxOrbList ${sar} S1B )"
       [ -z "${aux}" ] && return ${ERR_S1B_AUX}
       ;;
+    "RADARSAT-2")
+      aux=""
+      platform="RS2"
+    ;;
     *)
       aux=""
       ;;

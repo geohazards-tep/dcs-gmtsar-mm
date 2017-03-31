@@ -1,37 +1,32 @@
 
-function env_RADARSAT-2() {
+function env_RS2() {
   ciop-log "INFO" "Nothing to do in env_RADARSAT-2"
 }
 
-function get_aux_TSX() {
+function get_aux_RS2() {
   ciop-log "INFO" "Nothing to do in get_aux_RADARSAT-2"
 }
 
-function make_slc_RADARSAT-2() {
+function make_slc_RS2() {
 
   local sar_ref=$1
   local sar_date
+  local identifier
 
   sar_date=$( opensearch-client "${sar_ref}" startdate | cut -c 1-10 | tr -d "-" )
+  identifier=$( opensearch-client "${sar_ref}" identifier )
 
   cd ${TMPDIR}/runtime/raw
-
-  # GMT5SAR code
-  #cd $( dirname $( find . -name "*${sar_date}*.xml" ))
-  #make_slc_tsx $( find . -name "*${sar_date}*.xml" ) $( find IMAGEDATA -name "*.cos" ) TSX${sar_date}
-  #mv TSX${sar_date}* ${TMPDIR}/runtime/raw
-  #
-  #cd ${TMPDIR}/runtime/raw
-  ##make_slc_rs2 -idims_op_oc_dfd2_370205611_1/TSX-1.SAR.L1B/TSX1_SAR__SSC______SM_S_SRA_20120615T162057_20120615T162105/TSX1_SAR__SSC______SM_S_SRA_20120615T162057_20120615T162105.xml -pTSX20120615
+  make_slc_rs2 ${identifier}/product.xml ${identifier}/imagery_HH.tif RS2${sar_date}  
 
   tree 
-  extend_orbit TSX${sar_date}.LED tmp 3.
-  mv tmp TSX${sar_date}.LED
+  extend_orbit RS2${sar_date}.LED tmp 3.
+  mv tmp RS2${sar_date}.LED
   
 }
 
 
-function prep_data_RADARSAT-2() {
+function prep_data_RS2() {
   
   local joborder=$1
   
@@ -51,14 +46,14 @@ function prep_data_RADARSAT-2() {
   tar xvzf ${slave}
 
   # pre-process master
-  make_slc_TSX ${master_ref}
+  make_slc_RS2 ${master_ref}
   
   # pre-process slave
-  make_slc_TSX ${slave_ref}
+  make_slc_RS2 ${slave_ref}
   
 }
 
-function process_TSX() {
+function process_RS2() {
 
   local joborder=$1
 

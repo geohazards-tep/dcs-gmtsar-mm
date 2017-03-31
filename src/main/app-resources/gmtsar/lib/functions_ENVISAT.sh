@@ -6,13 +6,13 @@ function env_ENVISAT() {
 
   ciop-log "INFO" "Extending environment for ENVISAT ASAR"
  
-  export OS=$( uname -p )
-  export GMTHOME=/usr
-  export NETCDFHOME=/usr
-  export GMTSARHOME=/usr/local/GMTSAR
-  export GMTSAR=${GMTSARHOME}/gmtsar
-  export ENVIPRE=${GMTSARHOME}/ENVISAT_preproc
-  export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${GMTSARHOME}/ENVISAT_preproc/bin/:${GMTSARHOME}/ENVISAT_preproc/csh:${PATH}
+#  export OS=$( uname -p )
+#  export GMTHOME=/usr
+#  export NETCDFHOME=/usr
+#  export GMTSARHOME=/usr/local/GMTSAR
+#  export GMTSAR=${GMTSARHOME}/gmtsar
+#  export ENVIPRE=${GMTSARHOME}/ENVISAT_preproc
+#  export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${GMTSARHOME}/ENVISAT_preproc/bin/:${GMTSARHOME}/ENVISAT_preproc/csh:${PATH}
   
 #  export ENVIPRE=${GMTSARHOME}/ENVISAT_preproc
 #  export PATH=${PATH}:${GMTSARHOME}/ENVISAT_preproc/bin/:${GMTSARHOME}/ENVISAT_preproc/csh
