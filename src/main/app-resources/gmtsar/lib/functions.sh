@@ -30,6 +30,8 @@ function cleanExit () {
   
 }
 
+trap cleanExit EXIT
+
 function get_value() {
 
   local joborder=$1
@@ -117,6 +119,8 @@ function get_dem() {
 
   # retrieve the DEM
   dem_url="$( ciop-browseresults -r ${wf_id} -j ${job_id} | tr -d '\n\r' )" 
+
+  [ -z "${dem_url}" ] && return ${ERR_DEM}
 
   ciop-log "DEBUG" "dem url is ${dem_url}"
 

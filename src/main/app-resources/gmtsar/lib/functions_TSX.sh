@@ -17,18 +17,17 @@ function make_slc_TSX() {
   cd ${TMPDIR}/runtime/raw
 
   # GMT5SAR code
-  #cd $( dirname $( find . -name "*${sar_date}*.xml" ))
-  #make_slc_tsx $( find . -name "*${sar_date}*.xml" ) $( find IMAGEDATA -name "*.cos" ) TSX${sar_date}
-  #mv TSX${sar_date}* ${TMPDIR}/runtime/raw
-  #
-  #cd ${TMPDIR}/runtime/raw
-  ##make_slc_tsx -idims_op_oc_dfd2_370205611_1/TSX-1.SAR.L1B/TSX1_SAR__SSC______SM_S_SRA_20120615T162057_20120615T162105/TSX1_SAR__SSC______SM_S_SRA_20120615T162057_20120615T162105.xml -pTSX20120615
-  make_slc_tsx -i$( find . -name "*${sar_date}*.xml" ) -pTSX${sar_date}
+  cd $( dirname $( find . -name "*${sar_date}*.xml" ))
+  make_slc_tsx $( find . -name "*${sar_date}*.xml" ) $( find IMAGEDATA -name "*.cos" ) TSX${sar_date}
 
-  tree 
   extend_orbit TSX${sar_date}.LED tmp 3.
-  mv tmp TSX${sar_date}.LED
+  mv tmp ${TMPDIR}/runtime/raw/TSX${sar_date}.LED
   
+  mv $( find . -name "*${sar_date}.*" ) ${TMPDIR}/runtime/raw
+    
+  [ ! -e "${TMPDIR}/runtime/raw/TSX${sar_date}.LED" ] || [ ! -e "${TMPDIR}/runtime/raw/TSX${sar_date}.SLC" ] || [ ! -e "${TMPDIR}/runtime/raw/TSX${sar_date}.PRM" ] && return ${ERR_MAKE_SLC_TSX}
+
+  cd ${TMPDIR}/runtime/raw 
 }
 
 
