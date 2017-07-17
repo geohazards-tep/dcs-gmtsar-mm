@@ -7,6 +7,8 @@ ERR_GETAUX=40
 ERR_PREP_DATA=50
 ERR_JOBORDER=60
 ERR_DEMRESPONSE=70
+ERR_PROCESS=80
+ERR_CONF=90
 
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_S1.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_TSX.sh
@@ -22,6 +24,14 @@ function cleanExit () {
   case "${retval}" in
     ${SUCCESS}) msg="Processing successfully concluded";;
     ${ERR_DEM}) msg="No DEM";;
+    ${ERR_ENV}) msg="Error setting environment";;
+    ${ERR_SERIES}) msg="Error getting series";;
+    ${ERR_GETAUX}) msg="Error getting Auxiliary files";;
+    ${ERR_PREP_DATA}) msg="Error in pre-processing";;
+    ${ERR_JOBORDER}) msg="Cannot find Job order ";; 
+    ${ERR_DEMRESPONSE}) msg="Cannot find the DEM response";;
+    ${ERR_PROCESS}) msg="Error processing ";;
+    ${ERR_CONF}) msg="Cannot find config file";;    
     *) msg="Unknown error";;
   esac
 
@@ -92,7 +102,7 @@ function get_aux() {
 
   series=$( get_value ${joborder} "series" )
 
-  eval get_aux_${series} ${joborder} || return ${ERR_GET_AUX}
+  eval get_aux_${series} ${joborder} || return ${ERR_GETAUX}
 
 }
 
@@ -155,41 +165,41 @@ function publish() {
 
   # publish results and logs
   ciop-log "INFO" "publishing log files"
-  ciop-publish -m ${TMPDIR}/runtime/${result}_${flag}.log
+#  for path in $(find ${TMPDIR}/runtime/ -name "F*")
+ # do
+  #	ciop-publish -m ${path}/${result}_${flag}.log
+	path="${TMPDIR}/runtime"
+  	ciop-log "INFO" "result packaging"
+	  mydir=$( ls ${path}/intf/ | sed 's#.*/\(.*\)#\1#g' )
+
+	  ciop-log "DEBUG" "outputfolder is: ${TMPDIR}/runtime/intf + ${mydir}"
+
+	  cd ${path}/intf/${mydir}
+
+	  #creates the tiff files
+	  for mygrd in $( ls *ll.grd );
+	  do
+	    gdal_translate ${mygrd} $( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
+	  done
 	
-  ciop-log "INFO" "result packaging"
-  mydir=$( ls ${TMPDIR}/runtime/intf/ | sed 's#.*/\(.*\)#\1#g' )
-
-  ciop-log "DEBUG" "outputfolder is: ${TMPDIR}/runtime/intf + ${mydir}"
-
-  cd ${TMPDIR}/runtime/intf/${mydir}
-
-  #creates the tiff files
-  for mygrd in $( ls *ll.grd );
-  do
-    gdal_translate ${mygrd} $( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
-  done
-	
-  for mygrd in $( ls *.grd )
-  do 
-    gzip -9 ${mygrd}
-  done
+	  for mygrd in $( ls *.grd )
+	  do 
+	    gzip -9 ${mygrd}
+	  done
         
-  cd ${TMPDIR}/runtime/intf
+	  cd ${path}/intf
 
-  ciop-log "INFO" "publishing results"
-  for myext in png ps gz # tiff <- fix gdal_translate issue
-  do
-    ciop-publish -b ${TMPDIR}/runtime/intf -m ${mydir}/*.${myext}
-  done
-
+	  ciop-log "INFO" "publishing results"
+	  for myext in png ps gz # tiff <- fix gdal_translate issue
+	  do
+	    ciop-publish -b ${path}/intf -m ${mydir}/*.${myext}
+	  done
+  #done
 }
 
 function main() {
 
   set -x
-  
-
   
   local input
   local joborder_ref
@@ -217,12 +227,20 @@ function main() {
 
   get_dem ${dem_response} || return $?
 
-  get_aux ${joborder} || return $?
+  get_aux ${joborder} 
+
+  res=$?
+
+  ciop-log "INFO" "get_aux ended with ${res}"
 
   prep_data ${joborder} || return $?
 
   process ${joborder} || return $?
   
   publish 
+
+  cd ..
+
+#  rm -rf ${TMPDIR}
 
 }

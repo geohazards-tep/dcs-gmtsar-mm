@@ -90,6 +90,7 @@ function getS1AuxOrbList() {
 
   local sar=$1
   local platform=$2
+  local keyword=$3
   local osd="https://catalog.terradue.com/sentinel1-aux/search"
   local refs
 
@@ -102,12 +103,13 @@ function getS1AuxOrbList() {
   stopdate=$( opensearch-client ${sar} enddate | tr -d "Z")
   [ -z "${stopdate}" ] && return ${ERR_NOENDDATE}
 
-  refs="$( opensearch-client -p "psn=${platform}" -p "time:start=${startdate}" -p "time:end=${stopdate}" ${osd} )"
+  refs="$( opensearch-client -p "psn=${platform}" -p "time:start=${startdate}" -p "time:end=${stopdate}" ${osd} enclosure)"
   [ -z "${refs}" ] && return ${ERR_AUXREF}
 
-  for ref in ${refs}
+  for ref in $(echo ${refs} )
+#| grep "POEORB")
   do 
-    echo -e "orb=${ref}"
+	echo -e "${keyword}=${ref}"
   done
 
 }
@@ -117,6 +119,7 @@ function getAuxOrbList() {
   # generic function to retrieve aux data 
   
   local sar=$1
+  local keyword=$2
   local platform
   local identifier
 
@@ -132,18 +135,20 @@ function getAuxOrbList() {
 
   } 
   [ -z "${platform}" ] && return ${ERR_SAR_PLATFORM}
-  
+ 
+set -x
+ 
   case ${platform} in 
     "ENVISAT")
-      aux="$( getASARAuxOrbList ${sar} )"
+      aux="$( getASARAuxOrbList ${sar} orb)"
       [ -z "${aux}" ] && return ${ERR_ASAR_AUX}
       ;;
     "S1A")
-      aux="$( getS1AuxOrbList ${sar} S1A )"
+      aux="$( getS1AuxOrbList ${sar} S1A ${keyword})"
       [ -z "${aux}" ] && return ${ERR_S1A_AUX}
       ;;
     "S1B")
-      aux="$( getS1AuxOrbList ${sar} S1B )"
+      aux="$( getS1AuxOrbList ${sar} S1B ${keyword})"
       [ -z "${aux}" ] && return ${ERR_S1B_AUX}
       ;;
     "RADARSAT-2")
@@ -186,7 +191,7 @@ function main() {
   # to the master product 
   echo "master=${master}" > ${TMPDIR}/joborder
 
-  getAuxOrbList ${master} >> ${TMPDIR}/joborder
+  getAuxOrbList ${master} master_orb >> ${TMPDIR}/joborder
   res=$?
   [ ${res} -ne 0 ] && return ${res}
  
@@ -199,7 +204,7 @@ function main() {
   	
   echo "slave=${slave}" >> ${TMPDIR}/joborder
 
-  getAuxOrbList ${slave} >> ${TMPDIR}/joborder
+  getAuxOrbList ${slave} slave_orb >> ${TMPDIR}/joborder
   res=$?
   [ ${res} -ne 0 ] && return ${res}
    

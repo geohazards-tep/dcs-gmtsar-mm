@@ -11,24 +11,33 @@ function env_S1() {
 }
 
 function get_aux_S1A() {
-  get_aux_S1 $@
+  get_aux_S1 $@ master
+  get_aux_S1 $@ slave
+
+
+  res=$?
+
+  ciop-log "INFO" "result of get_auxS1A $res"
 }
 
 function get_aux_S1B() {
-  get_aux_S1 $@
+  get_aux_S1 $@ master
+  get_aux_S1 $@ slave
 }
 
 function get_aux_S1() {
   
   local joborder=$1
-
-  cat ${joborder} | grep orb | while read orb
+  local keyword=$2
+  cat ${joborder} | grep ${keyword}_orb | while read orb
   do 
     orb_ref=$( echo ${orb} | cut -d "=" -f 2- )
     
     ciop-log "INFO" "Retrieve orbital data from ${orb_ref}"
     
-    local_ref=$( ciop-copy -O ${TMPDIR}/runtime/raw ${orb_ref} )  
+    mkdir -p ${TMPDIR}/runtime/raw/${keyword}
+
+    local_ref=$( ciop-copy -O ${TMPDIR}/runtime/raw/${keyword} ${orb_ref} )  
     
     [ ! -e "${local_ref}" ] && return ${ERR_GET_AUX}
     
@@ -56,48 +65,99 @@ function prep_data_S1() {
   
   master_identifier=$( opensearch-client ${master_ref} identifier )
   slave_identifier=$( opensearch-client ${slave_ref} identifier )
-   
+ 
+  polarization=$( get_value ${joborder} "polarization" )
+  
   cd ${TMPDIR}/runtime/raw
 
-  mkdir master_raw
-  mkdir slave_raw
+#  mkdir master_raw
+#  mkdir slave_raw
+
+#TODO enable download from DA
+#  echo ${master_or} | ciop-copy -f -O master_raw -
+#  echo ${slave_or} | ciop-copy -f -O slave_raw - 
  
-  ln -s ../orig/${master_identifier}/${master_identifier}.SAFE/annotation/*.xml master_raw
-  ln -s ../orig/${master_identifier}/${master_identifier}.SAFE/measurement/*.tiff master_raw
-  ln -s ../orig/${slave_identifier}/${slave_identifier}.SAFE/annotation/*.xml slave_raw
-  ln -s ../orig/${slave_identifier}/${slave_identifier}.SAFE/measurement/*.tiff slave_raw
+  ln -s /home/fbrito/gmt5sar_inputs/master_raw  
+
+  ln -s /home/fbrito/gmt5sar_inputs/slave_raw  
+
+  ls -l master_raw/
+
+#We need to have all the files in the working dir
+
+  for file in $(find -L master_raw/ -name "*.xml" | grep -v calibration) 
+  do
+  	ln -s ${file}
+  done
+
+  for file in $(find -L slave_raw/ -name "*.xml" | grep -v calibration)
+  do
+        ln -s ${file} 
+  done
+
+  for file in $(find -L master_raw/ -name "*.tiff")
+  do
+        ln -s ${file}
+  done
+
+  for file in $(find -L slave_raw/ -name "*.tiff")
+  do
+        ln -s ${file}
+  done
+
+  tree ./
 
   ln -s ../topo/dem.grd .
-
-#TODO
-#define: which file numbers and which orbit urls
-
-  for filename in $(ls master_raw) do
+  polarization="$( ciop-getparam pol )"
+  master_orb="$(echo $(find ./master -name *.EOF) | tr ' ' '\n' | head -1)"
+  slave_orb="$(echo $(find ./slave -name *.EOF) | tr ' ' '\n' | head -1)"
+  for filename in $(find -L master_raw/ -name "*${polarization}*.tiff" -printf '%f\n') 
+  do
     master_prefix="${filename%.*}"
-    master_fn="{master_prefix: -3}"
-    slave_filname="$(find slave_raw/ -name *${master_fn}.tiff -printf '%f\n')"
+    master_fn="${master_prefix: -3}"
+    slave_filename="$(find -L slave_raw/ -name "*${master_fn}*.tiff" -printf '%f\n')"
     slave_prefix="${slave_filename%.*}"
-    csh align_tops.csh \
+    ciop-log "INFO" "align_tops.csh ${master_prefix} "${master_orb}" ${slave_prefix} "${slave_orb}" dem.grd "
+    align_tops.csh \
       ${master_prefix} \
-      S1A_OPER_AUX_POEORB_OPOD_20151125T122020_V20151104T225943_20151106T005943.EOF.txt \
+      ${master_orb} \
       ${slave_prefix} \
-      S1A_OPER_AUX_POEORB_OPOD_20151207T122501_V20151116T225943_20151118T005943.EOF.txt \
+      ${slave_orb} \
       dem.grd
+    [ $? -ne 0 ] && return ${ERR_PREP_DATA}
   done
+
+  tree ./
 
   cd ..
   rm -r F1/raw
+
+  cp ${_CIOP_APPLICATION_PATH}/gmtsar/etc/config.s1a.txt .
+ 
+  [ $? -ne 0 ] && return ${ERR_PROCESS}
+ 
+  master_prep_id=$(echo ${master_identifier} | cut -d '_' -f6 | cut -d 'T' -f1)
+  slave_prep_id=$(echo ${slave_identifier} | cut -d '_' -f6 | cut -d 'T' -f1)
+
   mkdir F1
   cd F1
   ln -s ../config.s1a.txt .
   mkdir raw
   cd raw
-  ln -s ../../raw/*F1* .
-  cd ..
+  cp ../../raw/*${master_prep_id}*F1* .
+  cp ../../raw/*${slave_prep_id}*F1* .
+  mkdir master
+  cd master
+  ln -s ../*${master_prep_id}*F1* .
+  cd ../
+  mkdir slave
+  cd slave
+  ln -s ../*${slave_prep_id}*F1* .
+  cd ../../
   mkdir topo
   cd topo
   ln -s ../../topo/dem.grd .
-  cd ../..
+  cd ../../
   #
   rm -r F2/raw
   mkdir F2
@@ -105,12 +165,20 @@ function prep_data_S1() {
   ln -s ../config.s1a.txt .
   mkdir raw
   cd raw
-  ln -s ../../raw/*F2* .
-  cd ..
+  cp ../../raw/*${master_prep_id}*F2* .
+  cp ../../raw/*${slave_prep_id}*F2* .
+  mkdir master
+  cd master
+  ln -s ../*${master_prep_id}*F2* .
+  cd ../
+  mkdir slave
+  cd slave
+  ln -s ../*${slave_prep_id}*F2* .
+  cd ../../
   mkdir topo
   cd topo
   ln -s ../../topo/dem.grd .
-  cd ../..
+  cd ../../
   #
   rm -r F3/raw
   mkdir F3
@@ -118,11 +186,23 @@ function prep_data_S1() {
   ln -s ../config.s1a.txt .
   mkdir raw
   cd raw
-  ln -s ../../raw/*F3* .
+  cp ../../raw/*${master_prep_id}*F3* .
+  cp ../../raw/*${slave_prep_id}*F3* .
+  mkdir master
+  cd master
+  ln -s ../*${master_prep_id}*F3* .
   cd ..
+  mkdir slave
+  cd slave
+  ln -s ../*${slave_prep_id}*F3* .
+  cd ../../
   mkdir topo
   cd topo
   ln -s ../../topo/dem.grd .
+
+  cd ../../
+
+  tree ./
   #
 
 }
@@ -140,51 +220,24 @@ function process_S1() {
 #
 #   make all the interferograms
 #
-  cd F1
-  p2p_S1A_TOPS.csh S1A20151105_163133_F1 S1A20151117_163127_F1 config.s1a.txt >& log &
-  cd ../F2
-  p2p_S1A_TOPS.csh S1A20151105_163134_F2 S1A20151117_163128_F2 config.s1a.txt >& log &
-  cd ../F3
-  p2p_S1A_TOPS.csh S1A20151105_163135_F3 S1A20151117_163129_F3 config.s1a.txt >& log &
 
-}
-
-function main() {
-
-  local input
-  local joborder_ref
-  local dem_response
-
-  export TMPDIR=/tmp/$( uuidgen )
-  mkdir -p ${TMPDIR}
-
-  cd ${TMPDIR}
-
-  input="$( cat )"
-  joborder_ref="$( echo ${input} | tr " " "\n" | grep joborder )"
-  dem_response="$( echo ${input} | tr " " "\n" | grep response )"
-
-  [ -z {"${joborder_ref}" ] && return ${ERR_JOBORDER}
-  [ -z {"${dem_response}" ] && return ${ERR_DEMRESPONSE} 
-    
-  ciop-log "INFO" "processing input: ${joborder_ref}"
- 
-  joborder=$( ciop-copy ${joborder_ref} )
-
-  [ ! -e "${joborder}" ] && return ${ERR_JOBORDER}
-
-  gmtsar_env ${joborder} || return $?
-
-  get_dem ${dem_response} || return $?
-
-  get_aux ${joborder} || return $?
-
-  prep_data ${joborder} || return $?
-
-  process ${joborder} || return $?
+  cd ${TMPDIR}/runtime
   
-  publish 
+#  master_prep_id="$(find ./F1/raw/master/ -printf "%f\n" | grep -v '/' | head -1 | cut -d 'T' -f1)"
+#  slave_prep_id="$(find ./F1/raw/slave/ -printf "%f\n" | grep -v '/' | head -1 | cut -d 'T' -f1)"
 
+#  for i in {1..3}
+ # do
+	for master_file in $(find ./*/raw/master/ -name *.SLC -printf "%f\n")
+	do 
+  	    filenumber=$(echo ${master_file} | cut -d '_' -f3 | cut -d '.' -f1)
+	    slave_file=$(find ./${filenumber}/raw/slave/ -name *.SLC -printf "%f\n")
+	    cd ${filenumber}
+	    p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt  
+   	    [ $? -ne 0 ] && return ${ERR_PROCESS}
+            cd ..
+	done
+  #done
 }
 
 
