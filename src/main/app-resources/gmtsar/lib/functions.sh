@@ -165,36 +165,35 @@ function publish() {
 
   # publish results and logs
   ciop-log "INFO" "publishing log files"
-#  for path in $(find ${TMPDIR}/runtime/ -name "F*")
- # do
+  for path in $(find ${TMPDIR}/runtime/ -name "F*")
+  do
   #	ciop-publish -m ${path}/${result}_${flag}.log
-	path="${TMPDIR}/runtime"
   	ciop-log "INFO" "result packaging"
-	  mydir=$( ls ${path}/intf/ | sed 's#.*/\(.*\)#\1#g' )
+	mydir=$( ls ${path}/intf/ | sed 's#.*/\(.*\)#\1#g' )
 
-	  ciop-log "DEBUG" "outputfolder is: ${TMPDIR}/runtime/intf + ${mydir}"
+	ciop-log "DEBUG" "outputfolder is: ${mydir}"
 
-	  cd ${path}/intf/${mydir}
+	cd ${path}/intf/${mydir}
 
-	  #creates the tiff files
-	  for mygrd in $( ls *ll.grd );
-	  do
-	    gdal_translate ${mygrd} $( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
-	  done
+	#creates the tiff files
+	for mygrd in $( ls *ll.grd );
+	do
+	   gdal_translate ${mygrd} $( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
+	done
 	
-	  for mygrd in $( ls *.grd )
-	  do 
-	    gzip -9 ${mygrd}
-	  done
+	for mygrd in $( ls *.grd )
+	do 
+	   gzip -9 ${mygrd}
+	done
         
-	  cd ${path}/intf
+	cd ${path}/intf
 
-	  ciop-log "INFO" "publishing results"
-	  for myext in png ps gz # tiff <- fix gdal_translate issue
-	  do
-	    ciop-publish -b ${path}/intf -m ${mydir}/*.${myext}
-	  done
-  #done
+	ciop-log "INFO" "publishing results"
+	for myext in png ps gz # tiff <- fix gdal_translate issue
+	do
+	   ciop-publish -b ${path}/intf -m ${mydir}/*.${myext}
+	done
+  done
 }
 
 function main() {

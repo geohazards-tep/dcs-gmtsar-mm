@@ -145,7 +145,7 @@ set -x
       ;;
     "S1A")
       aux="$( getS1AuxOrbList ${sar} S1A ${keyword})"
-      [ -z "${aux}" ] && return ${ERR_S1A_AUX}
+#      [ -z "${aux}" ] && return ${ERR_S1A_AUX}
       ;;
     "S1B")
       aux="$( getS1AuxOrbList ${sar} S1B ${keyword})"
@@ -191,7 +191,9 @@ function main() {
   # to the master product 
   echo "master=${master}" > ${TMPDIR}/joborder
 
-  getAuxOrbList ${master} master_orb >> ${TMPDIR}/joborder
+  #getAuxOrbList ${master} master_orb >> ${TMPDIR}/joborder
+  echo "series=S1A" >> ${TMPDIR}/joborder
+  echo "master_orb=file:///home/fbrito/S1/orig/S1A_OPER_AUX_POEORB_OPOD_20151125T122020_V20151104T225943_20151106T005943.EOF.txt" >> ${TMPDIR}/joborder
   res=$?
   [ ${res} -ne 0 ] && return ${res}
  
@@ -204,7 +206,8 @@ function main() {
   	
   echo "slave=${slave}" >> ${TMPDIR}/joborder
 
-  getAuxOrbList ${slave} slave_orb >> ${TMPDIR}/joborder
+#  getAuxOrbList ${slave} slave_orb >> ${TMPDIR}/joborder
+  echo "master_orb=file:///home/fbrito/S1/orig/slave_orb=S1A_OPER_AUX_POEORB_OPOD_20151207T122501_V20151116T225943_20151118T005943.EOF.txt" >> ${TMPDIR}/joborder
   res=$?
   [ ${res} -ne 0 ] && return ${res}
    

@@ -70,18 +70,12 @@ function prep_data_S1() {
   
   cd ${TMPDIR}/runtime/raw
 
-#  mkdir master_raw
-#  mkdir slave_raw
+  mkdir master_raw
+  mkdir slave_raw
 
-#TODO enable download from DA
-#  echo ${master_or} | ciop-copy -f -O master_raw -
-#  echo ${slave_or} | ciop-copy -f -O slave_raw - 
+  echo ${master_or} | ciop-copy -f -O master_raw -
+  echo ${slave_or} | ciop-copy -f -O slave_raw - 
  
-  ln -s /home/fbrito/gmt5sar_inputs/master_raw  
-
-  ln -s /home/fbrito/gmt5sar_inputs/slave_raw  
-
-  ls -l master_raw/
 
 #We need to have all the files in the working dir
 
@@ -223,21 +217,17 @@ function process_S1() {
 
   cd ${TMPDIR}/runtime
   
-#  master_prep_id="$(find ./F1/raw/master/ -printf "%f\n" | grep -v '/' | head -1 | cut -d 'T' -f1)"
-#  slave_prep_id="$(find ./F1/raw/slave/ -printf "%f\n" | grep -v '/' | head -1 | cut -d 'T' -f1)"
-
-#  for i in {1..3}
- # do
-	for master_file in $(find ./*/raw/master/ -name *.SLC -printf "%f\n")
-	do 
-  	    filenumber=$(echo ${master_file} | cut -d '_' -f3 | cut -d '.' -f1)
-	    slave_file=$(find ./${filenumber}/raw/slave/ -name *.SLC -printf "%f\n")
-	    cd ${filenumber}
-	    p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt  
-   	    [ $? -ne 0 ] && return ${ERR_PROCESS}
-            cd ..
-	done
-  #done
+  for master_file in $(find ./*/raw/master/ -name *.SLC -printf "%f\n")
+    do 
+      filenumber=$(echo ${master_file} | cut -d '_' -f3 | cut -d '.' -f1)
+      slave_file=$(find ./${filenumber}/raw/slave/ -name *.SLC -printf "%f\n")
+      cd ${filenumber}
+      p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt  
+      [ $? -ne 0 ] && return ${ERR_PROCESS}
+      cd ..
+  done
+  ciop-log "INFO" "Final tree"
+  tree ./ 
 }
 
 
