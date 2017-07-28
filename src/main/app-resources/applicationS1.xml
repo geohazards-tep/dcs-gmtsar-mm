@@ -5,15 +5,6 @@
       <streamingExecutable>/application/aux/run</streamingExecutable>
       <defaultParameters>
         <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170201T222518_20170201T222548_015096_018ADF_4A08</parameter>
-        <parameter id="pol" title="Polarization" abstract="Polarization" scope="runtime" maxOccurs="1">
-          <options>
-            <option>VV</option>
-            <option>VH</option>
-            <option>HH</option>
-            <option>HV</option>
-            <default>VV</default>
-          </options>
-        </parameter>
       </defaultParameters>
       <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
@@ -35,7 +26,17 @@
     </jobTemplate>
     <jobTemplate id="gmtsar">
       <streamingExecutable>/application/gmtsar/run</streamingExecutable>
-      <defaultParameters/>
+      <defaultParameters>
+        <parameter id="pol" title="Polarization" abstract="Polarization" scope="runtime" maxOccurs="1">
+          <options>
+            <option>vv</option>
+            <option>vh</option>
+            <option>hh</option>
+            <option>hv</option>
+            <default>vv</default>
+          </options>
+        </parameter>
+      </defaultParameters>
       <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
         <property id="mapred.task.timeout">7200000</property>
@@ -47,16 +48,16 @@
     <node id="node_aux">
       <job id="aux"/>
       <sources>
-        <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20151117T163127_20151117T163155_008647_00C499_5DC1</source>
+        <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170714T132030_20170714T132057_017468_01D32A_F5F4</source>
       </sources>
       <parameters>
-        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20151105T163133_20151105T163201_008472_00BFA6_D862</parameter>
+        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170726T132031_20170726T132058_017643_01D887_61E9</parameter>
       </parameters>
     </node>
     <node id="node_dem">
       <job id="dem"/>
       <sources>
-        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170201T222518_20170201T222548_015096_018ADF_4A08</source>
+        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170726T132031_20170726T132058_017643_01D887_61E9</source>
       </sources>
       <parameters/>
     </node>

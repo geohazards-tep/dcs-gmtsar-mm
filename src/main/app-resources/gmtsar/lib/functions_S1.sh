@@ -66,8 +66,7 @@ function prep_data_S1() {
   master_identifier=$( opensearch-client ${master_ref} identifier )
   slave_identifier=$( opensearch-client ${slave_ref} identifier )
  
-  polarization=$( get_value ${joborder} "polarization" )
-  
+
   cd ${TMPDIR}/runtime/raw
 
   mkdir master_raw
@@ -103,8 +102,8 @@ function prep_data_S1() {
 
   ln -s ../topo/dem.grd .
   polarization="$( ciop-getparam pol )"
-  master_orb="$(echo $(find ./master -name *.EOF) | tr ' ' '\n' | head -1)"
-  slave_orb="$(echo $(find ./slave -name *.EOF) | tr ' ' '\n' | head -1)"
+  master_orb="$(echo $(find -L ./master -name *.EOF*) | tr ' ' '\n' | head -1)"
+  slave_orb="$(echo $(find -L ./slave -name *.EOF*) | tr ' ' '\n' | head -1)"
   for filename in $(find -L master_raw/ -name "*${polarization}*.tiff" -printf '%f\n') 
   do
     master_prefix="${filename%.*}"
