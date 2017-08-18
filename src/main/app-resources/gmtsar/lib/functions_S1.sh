@@ -6,6 +6,14 @@ function env_S1B() {
   env_S1 $@
 }
 
+function env_S1AS1B() {
+  env_S1 $@
+}
+
+function env_S1BS1A() {
+  env_S1 $@
+}
+
 function env_S1() {
   ciop-log "INFO" "Nothing to do in env_S1"
 }
@@ -21,6 +29,16 @@ function get_aux_S1A() {
 }
 
 function get_aux_S1B() {
+  get_aux_S1 $@ master
+  get_aux_S1 $@ slave
+}
+
+function get_aux_S1AS1B() {
+  get_aux_S1 $@ master
+  get_aux_S1 $@ slave
+}
+
+function get_aux_S1BS1A() {
   get_aux_S1 $@ master
   get_aux_S1 $@ slave
 }
@@ -50,6 +68,14 @@ function prep_data_S1A() {
 }
 
 function prep_data_S1B() {
+  prep_data_S1 $@
+}
+
+function prep_data_S1AS1B() {
+  prep_data_S1 $@
+}
+
+function prep_data_S1BS1A() {
   prep_data_S1 $@
 }
 
@@ -98,30 +124,30 @@ function prep_data_S1() {
         ln -s ${file}
   done
 
-  tree ./
-
   ln -s ../topo/dem.grd .
   polarization="$( ciop-getparam pol )"
+
+  # why this find ?
   master_orb="$(echo $(find -L ./master -name *.EOF*) | tr ' ' '\n' | head -1)"
   slave_orb="$(echo $(find -L ./slave -name *.EOF*) | tr ' ' '\n' | head -1)"
+
   for filename in $(find -L master_raw/ -name "*${polarization}*.tiff" -printf '%f\n') 
   do
     master_prefix="${filename%.*}"
     master_fn="${master_prefix: -3}"
-    slave_filename="$(find -L slave_raw/ -name "*${master_fn}*.tiff" -printf '%f\n')"
+    slave_filename="$(find -L slave_raw/ -name "*${polarization}*${master_fn}.tiff" -printf '%f\n')"
     slave_prefix="${slave_filename%.*}"
+
     ciop-log "INFO" "align_tops.csh ${master_prefix} "${master_orb}" ${slave_prefix} "${slave_orb}" dem.grd "
     align_tops.csh \
       ${master_prefix} \
       ${master_orb} \
       ${slave_prefix} \
       ${slave_orb} \
-      dem.grd
+      dem.grd &> ${TMPDIR}/align_top_${master_prefix}.log
     [ $? -ne 0 ] && return ${ERR_PREP_DATA}
+    ciop-publish -m ${TMPDIR}/align_top_${master_prefix}.log
   done
-
-  tree ./
-
   cd ..
   rm -r F1/raw
 
@@ -195,9 +221,6 @@ function prep_data_S1() {
 
   cd ../../
 
-  tree ./
-  #
-
 }
 
 function process_S1A() {
@@ -205,6 +228,14 @@ function process_S1A() {
 }
 
 function process_S1B() {
+  process_S1 $@
+}
+
+function process_S1AS1B() {
+  process_S1 $@
+}
+
+function process_S1BS1A() {
   process_S1 $@
 }
 
@@ -225,8 +256,6 @@ function process_S1() {
       [ $? -ne 0 ] && return ${ERR_PROCESS}
       cd ..
   done
-  ciop-log "INFO" "Final tree"
-  tree ./ 
 }
 
 

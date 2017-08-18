@@ -58,7 +58,7 @@ function get_series() {
   local joborder=$1
   local series
   
-  series=$( get_value ${joborder} "series" )
+  series=$( get_value ${joborder} "series" | tr -d "\n" | tr -d " " )
   
   [ -z "${series}" ] && return ${ERR_SERIES}
   
@@ -81,29 +81,21 @@ function gmtsar_env() {
 
   series=$( get_series ${joborder} )
 
-  #. /etc/profile.d/gmt4sar.sh
   . /etc/profile.d/gmt5sar.sh  
-  #export GMTHOME=/usr
-  #export NETCDFHOME=/usr
-  #export GMTSARHOME=/usr/local/GMTSAR
-  #export GMTSAR=${GMTSARHOME}/gmtsar
-
-  #export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${PATH}
+  
   export GMTSAR=/usr/local/GMT5SAR
   export PATH=${GMTSAR}/bin:${PATH}
 
   eval env_${series} ${joborder} || return ${ERR_ENV}
-  
 }
 
 function get_aux() {
 
   local joborder=$1  
 
-  series=$( get_value ${joborder} "series" )
+  series=$( get_series ${joborder} )
 
   eval get_aux_${series} ${joborder} || return ${ERR_GETAUX}
-
 }
 
 function prep_data() {
@@ -114,7 +106,6 @@ function prep_data() {
   series=$( get_series ${joborder} )
 
   eval prep_data_${series} ${joborder} || return ${ERR_PREP_DATA}
-
 }
 
 function get_dem() {
@@ -155,8 +146,8 @@ function process() {
   local series
   local joborder=$1
 
-  series=$( get_series ${joborder} ) 
-
+  series=$( get_series ${joborder} )  
+  
   eval process_${series} ${joborder} || return $?
 
 }
@@ -198,14 +189,9 @@ function publish() {
 
 function main() {
 
-  set -x
-  
   local input
   local joborder_ref
   local dem_response
-
-  export TMPDIR=/tmp/$( uuidgen )
-  mkdir -p ${TMPDIR}
 
   cd ${TMPDIR}
 
@@ -239,7 +225,5 @@ function main() {
   publish 
 
   cd ..
-
-#  rm -rf ${TMPDIR}
 
 }

@@ -4,7 +4,7 @@
     <jobTemplate id="aux">
       <streamingExecutable>/application/aux/run</streamingExecutable>
       <defaultParameters>
-        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170201T222518_20170201T222548_015096_018ADF_4A08</parameter>
+        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170724T041510_20170724T041538_017608_01D766_AB23</parameter>
       </defaultParameters>
       <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
@@ -48,16 +48,16 @@
     <node id="node_aux">
       <job id="aux"/>
       <sources>
-        <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170714T132030_20170714T132057_017468_01D32A_F5F4</source>
+        <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1B_IW_SLC__1SDV_20170718T041442_20170718T041509_006537_00B7E8_BD0D</source>
       </sources>
       <parameters>
-        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170726T132031_20170726T132058_017643_01D887_61E9</parameter>
+        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170724T041510_20170724T041538_017608_01D766_AB23</parameter>
       </parameters>
     </node>
     <node id="node_dem">
       <job id="dem"/>
       <sources>
-        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170726T132031_20170726T132058_017643_01D887_61E9</source>
+        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170724T041510_20170724T041538_017608_01D766_AB23</source>
       </sources>
       <parameters/>
     </node>
