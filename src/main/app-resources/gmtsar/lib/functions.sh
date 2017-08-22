@@ -86,6 +86,9 @@ function gmtsar_env() {
   export GMTSAR=/usr/local/GMT5SAR
   export PATH=${GMTSAR}/bin:${PATH}
 
+  # for gdal
+  export PATH=/opt/anaconda/bin:$PATH
+
   eval env_${series} ${joborder} || return ${ERR_ENV}
 }
 
@@ -154,12 +157,10 @@ function process() {
 
 function publish() {
 
-  # publish results and logs
-  ciop-log "INFO" "publishing log files"
+  # publish results 
   for path in $(find ${TMPDIR}/runtime/ -name "F*")
   do
-  #	ciop-publish -m ${path}/${result}_${flag}.log
-  	ciop-log "INFO" "result packaging"
+  	ciop-log "INFO" "result packaging ${path}"
 	mydir=$( ls ${path}/intf/ | sed 's#.*/\(.*\)#\1#g' )
 
 	ciop-log "DEBUG" "outputfolder is: ${mydir}"
@@ -169,7 +170,10 @@ function publish() {
 	#creates the tiff files
 	for mygrd in $( ls *ll.grd );
 	do
-	   gdal_translate ${mygrd} $( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
+	  mytiff=$( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
+          gdal_translate ${mygrd} $( echo ${mygrd} | sed 's#\.grd#.tiff#g' )
+          listgeo -tfw ${mytiff}
+          mv $( echo ${mygrd} | sed 's#\.grd#.tfw#g' ) $( echo ${mygrd} | sed 's#\.grd#.pngw#g' )
 	done
 	
 	for mygrd in $( ls *.grd )
@@ -177,12 +181,12 @@ function publish() {
 	   gzip -9 ${mygrd}
 	done
         
-	cd ${path}/intf
+	#cd ${path}/intf       
 
 	ciop-log "INFO" "publishing results"
-	for myext in png ps gz # tiff <- fix gdal_translate issue
+	for myext in png ps gz tiff pngw
 	do
-	   ciop-publish -b ${path}/intf -m ${mydir}/*.${myext}
+	   ciop-publish -b ${path}/intf -m *.${myext}
 	done
   done
 }
@@ -222,8 +226,6 @@ function main() {
 
   process ${joborder} || return $?
   
-  publish 
-
-  cd ..
+  publish || return $?
 
 }

@@ -1,3 +1,6 @@
+ set -x 
+
+
 function env_S1A() {
   env_S1 $@
 }
@@ -15,7 +18,33 @@ function env_S1BS1A() {
 }
 
 function env_S1() {
-  ciop-log "INFO" "Nothing to do in env_S1"
+  ciop-log "INFO" "Updating GMTSAR configuration file"
+
+  local threshold_snaphu=$( ciop-getparam "threshold_snaphu" )
+
+  s1_conf=${TMPDIR}/runtime/config.s1a.txt
+
+cat <<EOF > ${s1_conf}
+
+proc_stage = 1
+num_patches =
+earth_radius =
+near_range =
+fd1 =
+topo_phase = 1
+shift_topo = 0
+switch_master = 0
+filter_wavelength = 300
+dec_factor = 2
+threshold_snaphu = ${threshold_snaphu}
+region_cut =
+switch_land = 1
+defomax = 0
+threshold_geocode = .10
+EOF
+ 
+  ciop-publish -m ${s1_conf}
+
 }
 
 function get_aux_S1A() {
@@ -148,13 +177,9 @@ function prep_data_S1() {
     [ $? -ne 0 ] && return ${ERR_PREP_DATA}
     ciop-publish -m ${TMPDIR}/align_top_${master_prefix}.log
   done
-  cd ..
-  rm -r F1/raw
 
-  cp ${_CIOP_APPLICATION_PATH}/gmtsar/etc/config.s1a.txt .
- 
-  [ $? -ne 0 ] && return ${ERR_PROCESS}
- 
+  cd ..
+
   master_prep_id=$(echo ${master_identifier} | cut -d '_' -f6 | cut -d 'T' -f1)
   slave_prep_id=$(echo ${slave_identifier} | cut -d '_' -f6 | cut -d 'T' -f1)
 
