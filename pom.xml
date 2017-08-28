@@ -48,7 +48,7 @@
                 <configuration>
                 <mappings combine.children="append">
                     <mapping>
-                      <!--<directory>/application</directory>-->
+                      <directory>/application</directory>
                       <sources>
                         <source>
                          <location>/application/application${mission}.xml</location>
