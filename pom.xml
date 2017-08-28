@@ -48,11 +48,12 @@
                 <configuration>
                 <mappings combine.children="append">
                     <mapping>
-                      <directory>/application/application.xml</directory>
+                      <directory>/application</directory>
                       <sources>
-                        <source>
-                          <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
-                        </source>
+                        <softlinkSource>
+                          <destination>application${mission}.xml</destination>
+                          <location>application.xml</location>
+                        </softlinkSource>
                       </sources>
                     </mapping>
                   </mappings>
