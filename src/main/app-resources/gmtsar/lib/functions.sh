@@ -181,12 +181,12 @@ function publish() {
 	   gzip -9 ${mygrd}
 	done
         
-	#cd ${path}/intf       
+	cd ${path}/intf/${mydir}       
 
 	ciop-log "INFO" "publishing results"
 	for myext in png ps gz tiff pngw
 	do
-	   ciop-publish -b ${path}/intf -m *.${myext}
+	   ciop-publish -b ${path}/intf/${mydir} -m *.${myext}
 	done
   done
 }
@@ -226,6 +226,6 @@ function main() {
 
   process ${joborder} || return $?
   
-  publish || return $?
+  publish #|| return $?
 
 }

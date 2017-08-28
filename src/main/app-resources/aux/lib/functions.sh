@@ -106,11 +106,29 @@ function getS1AuxOrbList() {
   refs="$( opensearch-client -p "psn=${platform}" -p "time:start=${startdate}" -p "time:end=${stopdate}" ${osd} enclosure)"
   [ -z "${refs}" ] && return ${ERR_AUXREF}
 
+  #checking for the latest version
+
+  local latest
+  local latref
   for ref in $(echo ${refs} )
 #| grep "POEORB")
-  do 
-	echo -e "${keyword}=${ref}"
+  do
+	auxuid=${ref##*/}
+	published=$( opensearch-client "${osd}?uid=${auxuid}" published | cut -d '+' -f1)
+	[ -z "${published}" ] && return ${ERR_AUXPUB}
+
+	ciop-log "INFO" "Published data ${published}"
+
+	[ -z ${latest} ] && latest=${published}
+
+	if [ $( date -d "${published}" +%s ) -ge $( date -d "${latest}" +%s ) ];
+	then	
+		latest=${published}
+		latref=${ref}
+	fi
   done
+
+  echo -e "${keyword}=${latref}"
 
 }
 
