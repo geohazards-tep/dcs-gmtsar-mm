@@ -51,9 +51,9 @@
                       <directory>/application</directory>
                       <sources>
                         <source>
-                         <location>/application/application${mission}.xml</location>
-                         <destination>/application/application.xml</destination>
-                     </source>
+                          <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
+                          <destination>/application/application.xml</destination>
+                        </source>
                       </sources>
                     </mapping>
                   </mappings>
@@ -120,10 +120,10 @@
                   <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <executable>mv</executable>
+                  <executable>cp</executable>
                   <arguments>
-                    <argument>/application/application.xml</argument>
                     <argument>/application/application${mission}.xml</argument>
+                    <argument>/application/application.xml</argument>
                   </arguments>
                 </configuration>
               </execution>
