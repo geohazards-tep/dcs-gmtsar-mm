@@ -51,8 +51,8 @@
                       <directory>/application</directory>
                       <sources>
                         <softlinkSource>
-                          <destination>application${mission}.xml</destination>
-                          <location>application.xml</location>
+                          <destination>application.xml</destination>
+                          <location>application${mission}.xml</location>
                         </softlinkSource>
                       </sources>
                     </mapping>
