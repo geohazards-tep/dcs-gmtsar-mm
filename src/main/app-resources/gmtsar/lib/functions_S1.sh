@@ -1,5 +1,3 @@
- set -x 
-
 
 function env_S1A() {
   env_S1 $@
@@ -277,8 +275,17 @@ function process_S1() {
       filenumber=$(echo ${master_file} | cut -d '_' -f3 | cut -d '.' -f1)
       slave_file=$(find ./${filenumber}/raw/slave/ -name *.SLC -printf "%f\n")
       cd ${filenumber}
-      p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt  
+      ciop-log "INFO" "Interferogram generation for ${filenumber}  ${master_file%.*} ${slave_file%.*}"
+      p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt &> ${TMPDIR}/p2p_S1A_TOPS.log 
       [ $? -ne 0 ] && return ${ERR_PROCESS}
+      ciop-publish -m ${TMPDIR}/p2p_S1A_TOPS_${filenumber}.log
+   
+      for result in $( find ${TMPDIR}/runtime/${filenumber}/intf )
+      do  
+       echo ${result} 
+
+      done
+  
       cd ..
   done
 }
