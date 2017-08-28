@@ -122,8 +122,8 @@
                 <configuration>
                   <executable>mv</executable>
                   <arguments>
-                    <argument>/application/application${mission}.xml</argument>
                     <argument>/application/application.xml</argument>
+                    <argument>/application/application${mission}.xml</argument>
                   </arguments>
                 </configuration>
               </execution>
