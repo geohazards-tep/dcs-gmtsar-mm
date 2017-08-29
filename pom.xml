@@ -29,10 +29,10 @@
     <profile>
       <id>package-app</id>
       <activation>
-         <property>
-           <name>env</name>
-           <value>ci</value>
-         </property>
+        <property>
+          <name>env</name>
+          <value>ci</value>
+        </property>
       </activation>
       <build>
         <plugins>
@@ -46,24 +46,15 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
-                <mappings combine.children="append">
-                  
+                  <mappings combine.children="append" combine.self="override">
                     <mapping>
                       <directory>/application</directory>
                       <sources>
                         <source>
                           <location>${basedir}/src/main/app-resources</location>
                         </source>
-                      </sources>
-                    </mapping>  
-                  <mapping>
-                      <directory>/application</directory>
-                      <sources>
-                        <source>
-                          <location>${basedir}/src/main/app-resources</location>
-                        </source>
                         <softlinkSource>
-                          <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
+                          <location>application${mission}.xml</location>
                           <destination>application.xml</destination>
                         </softlinkSource>
                       </sources>
@@ -80,7 +71,7 @@
         </plugins>
       </build>
     </profile>
-     <profile>
+    <profile>
       <id>install-and-test</id>
       <activation>
         <property>
@@ -105,15 +96,15 @@
                   <resources>
                     <resource>
                       <directory>${basedir}/src/main/app-resources/</directory>
-                       <excludes>
-                    	<exclude>**/application*.xml</exclude>
-                  	</excludes>
+                      <excludes>
+                        <exclude>**/application*.xml</exclude>
+                      </excludes>
                     </resource>
                     <resource>
                       <directory>${basedir}/src/main/app-resources/</directory>
-                       <includes>
-                    	<include>**/application${mission}.xml</include>
-                  	</includes>
+                      <includes>
+                        <include>**/application${mission}.xml</include>
+                      </includes>
                     </resource>
                   </resources>
                 </configuration>
