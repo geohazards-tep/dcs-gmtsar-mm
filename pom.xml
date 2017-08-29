@@ -60,9 +60,12 @@
                       <directory>/application</directory>
                       <sources>
                         <source>
+                          <location>${basedir}/src/main/app-resources</location>
+                        </source>
+                        <softlinkSource>
                           <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
                           <destination>/application/application.xml</destination>
-                        </source>
+                        </softlinkSource>
                       </sources>
                     </mapping>
                   </mappings>
