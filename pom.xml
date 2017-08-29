@@ -47,7 +47,16 @@
                 </goals>
                 <configuration>
                 <mappings combine.children="append">
+                  
                     <mapping>
+                      <directory>/application</directory>
+                      <sources>
+                        <source>
+                          <location>${basedir}/src/main/app-resources</location>
+                        </source>
+                      </sources>
+                    </mapping>  
+                  <mapping>
                       <directory>/application</directory>
                       <sources>
                         <source>
