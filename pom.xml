@@ -64,7 +64,7 @@
                         </source>
                         <softlinkSource>
                           <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
-                          <destination>/application/application.xml</destination>
+                          <destination>application.xml</destination>
                         </softlinkSource>
                       </sources>
                     </mapping>
