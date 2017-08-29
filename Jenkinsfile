@@ -29,9 +29,6 @@ pipeline {
           sh 'mvn -X -e -B deploy -D mission=S1'
         }
 
-        script {
-          artserver.publishBuildInfo buildInfo
-        }
       }
     }
     
@@ -44,9 +41,6 @@ pipeline {
           sh 'mvn -B deploy -Dmission=ENVISAT'
         }
 
-        script {
-          artserver.publishBuildInfo buildInfo
-        }
       }
     }
     
@@ -59,9 +53,6 @@ pipeline {
           sh 'mvn -B deploy -Dmission=RS2'
         }
 
-        script {
-          artserver.publishBuildInfo buildInfo
-        }
       }
     }
     
@@ -74,9 +65,6 @@ pipeline {
           sh 'mvn -B deploy -Dmission=TSX'
         }
 
-        script {
-          artserver.publishBuildInfo buildInfo
-        }
       }
     }
     
