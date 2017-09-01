@@ -115,7 +115,16 @@ function prep_data_S1() {
   
   master_or="$( opensearch-client ${master_ref} enclosure )" 
   slave_or="$( opensearch-client  ${slave_ref} enclosure )"
-  
+  [ -z ${master_or} ] && {
+    ciop-log "ERROR" "Could not resolve master enclosure"
+    return 2
+  }
+
+  [ -z ${slave_or} ] && {
+    ciop-log "ERROR" "Could not resolve slave enclosure"
+    return 2
+  }
+ 
   master_identifier=$( opensearch-client ${master_ref} identifier )
   slave_identifier=$( opensearch-client ${slave_ref} identifier )
  
@@ -125,9 +134,20 @@ function prep_data_S1() {
   mkdir master_raw
   mkdir slave_raw
 
-  echo ${master_or} | ciop-copy -f -O master_raw -
-  echo ${slave_or} | ciop-copy -f -O slave_raw - 
- 
+  ciop-log "INFO" "Retrieve Sentinel-1 master product"
+  local_master=$( ciop-copy -f -O master_raw ${master_or} )
+  [ -z ${local_master} ] && {
+    ciop-log "ERROR" "Could not retrieve master"
+    return 4
+  }
+
+  ciop-log "INFO" "Retrieve Sentinel-1 slave product"
+  local_slave=$( ciop-copy -f -O slave_raw ${slave_or} )
+  [ -z ${local_slave} ] && {
+    ciop-log "ERROR" "Could not retrieve slave"
+    return 4
+  } 
+
 
 #We need to have all the files in the working dir
 
@@ -151,8 +171,10 @@ function prep_data_S1() {
         ln -s ${file}
   done
 
-  ln -s ../topo/dem.grd .
+#  ln -s ../topo/dem.grd .
   polarization="$( ciop-getparam pol )"
+
+  ciop-log "INFO" "Process polarization $( echo ${polarization} | tr a-z A-Z )"
 
   # why this find ?
   master_orb="$(echo $(find -L ./master -name *.EOF*) | tr ' ' '\n' | head -1)"
@@ -181,6 +203,7 @@ function prep_data_S1() {
   master_prep_id=$(echo ${master_identifier} | cut -d '_' -f6 | cut -d 'T' -f1)
   slave_prep_id=$(echo ${slave_identifier} | cut -d '_' -f6 | cut -d 'T' -f1)
 
+  ciop-log "INFO" "Prepare environment for interferogram generation"  
   mkdir F1
   cd F1
   ln -s ../config.s1a.txt .
@@ -201,7 +224,7 @@ function prep_data_S1() {
   ln -s ../../topo/dem.grd .
   cd ../../
   #
-  rm -r F2/raw
+  [ -e "F2/raw" ] && rm -r F2/raw
   mkdir F2
   cd F2
   ln -s ../config.s1a.txt .
@@ -222,7 +245,7 @@ function prep_data_S1() {
   ln -s ../../topo/dem.grd .
   cd ../../
   #
-  rm -r F3/raw
+  [ -e "F3/raw" ] && rm -r F3/raw
   mkdir F3
   cd F3
   ln -s ../config.s1a.txt .
@@ -267,7 +290,7 @@ function process_S1() {
 #
 #   make all the interferograms
 #
-
+set -x
   cd ${TMPDIR}/runtime
   
   for master_file in $(find ./*/raw/master/ -name *.SLC -printf "%f\n")
@@ -276,16 +299,23 @@ function process_S1() {
       slave_file=$(find ./${filenumber}/raw/slave/ -name *.SLC -printf "%f\n")
       cd ${filenumber}
       ciop-log "INFO" "Interferogram generation for ${filenumber}  ${master_file%.*} ${slave_file%.*}"
-      p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt &> ${TMPDIR}/p2p_S1A_TOPS.log 
+      p2p_S1A_TOPS.csh ${master_file%.*} ${slave_file%.*} config.s1a.txt &> ${TMPDIR}/p2p_S1A_TOPS_${filenumber}.log 
       [ $? -ne 0 ] && return ${ERR_PROCESS}
-      ciop-publish -m ${TMPDIR}/p2p_S1A_TOPS_${filenumber}.log
-   
-      for result in $( find ${TMPDIR}/runtime/${filenumber}/intf )
-      do  
-       echo ${result} 
+      ciop-log "INFO" "Interferogram generation for ${filenumber} done"
 
-      done
+      ciop-log "INFO" "GMT5SAR p2p_S1A_TOPS log for ${filenumber} publication" 
+      ciop-publish -m ${TMPDIR}/p2p_S1A_TOPS_${filenumber}.log
+
+      ciop-log "INFO" "${filenumber} interferogram results update"
+      tree ${TMPDIR}/runtime/ > /tmp/tree0
+      for result in $( find ${TMPDIR}/runtime/${filenumber}/intf/*/* )
+      do  
+        ciop-log "DEBUG" "result: ${result} - ${TMPDIR}/runtime/intf/${filenumber}_$( basename ${result} )"
+        #mv ${result} $( dirname ${result} )/${filenumber}_$( basename ${result} )
+        mv ${result} ${TMPDIR}/runtime/intf/${filenumber}_$( basename ${result} )
+     done
   
+      tree $( dirname ${result} ) > /tmp/tree
       cd ..
   done
 }

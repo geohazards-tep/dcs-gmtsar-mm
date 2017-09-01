@@ -1,3 +1,4 @@
+set -x
 
 SUCCESS=0
 ERR_ENV=10
@@ -9,6 +10,7 @@ ERR_JOBORDER=60
 ERR_DEMRESPONSE=70
 ERR_PROCESS=80
 ERR_CONF=90
+ERR_PUBLISH=95
 
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_S1.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_TSX.sh
@@ -26,12 +28,13 @@ function cleanExit () {
     ${ERR_DEM}) msg="No DEM";;
     ${ERR_ENV}) msg="Error setting environment";;
     ${ERR_SERIES}) msg="Error getting series";;
-    ${ERR_GETAUX}) msg="Error getting Auxiliary files";;
+    ${ERR_GETAUX}) msg="Error getting auxiliary files";;
     ${ERR_PREP_DATA}) msg="Error in pre-processing";;
     ${ERR_JOBORDER}) msg="Cannot find Job order ";; 
     ${ERR_DEMRESPONSE}) msg="Cannot find the DEM response";;
     ${ERR_PROCESS}) msg="Error processing ";;
-    ${ERR_CONF}) msg="Cannot find config file";;    
+    ${ERR_CONF}) msg="Cannot find config file";;
+    ${ERR_PUBLISH}) msg="Cannot publish results";;    
     *) msg="Unknown error";;
   esac
 
@@ -158,14 +161,16 @@ function process() {
 function publish() {
 
   # publish results 
-  for path in $(find ${TMPDIR}/runtime/ -name "F*")
-  do
-  	ciop-log "INFO" "result packaging ${path}"
-	mydir=$( ls ${path}/intf/ | sed 's#.*/\(.*\)#\1#g' )
+  #for path in $(find ${TMPDIR}/runtime/ -name "F*")
+  #do
+#  	ciop-log "INFO" "result packaging ${path}"
+#	mydir=$( ls ${path}/intf/ | sed 's#.*/\(.*\)#\1#g' )
+#
+#	ciop-log "DEBUG" "outputfolder is: ${mydir}"
 
-	ciop-log "DEBUG" "outputfolder is: ${mydir}"
+#	cd ${path}/intf/${mydir}
 
-	cd ${path}/intf/${mydir}
+        cd ${TMPDIR}/runtime/intf
 
 	#creates the tiff files
 	for mygrd in $( ls *ll.grd );
@@ -181,14 +186,14 @@ function publish() {
 	   gzip -9 ${mygrd}
 	done
         
-	cd ${path}/intf/${mydir}       
+	#cd ${path}/intf/${mydir}       
 
 	ciop-log "INFO" "publishing results"
 	for myext in png ps gz tiff pngw
 	do
-	   ciop-publish -b ${path}/intf/${mydir} -m *.${myext}
+	   ciop-publish -b ${TMPDIR}/runtime/intf -m *.${myext}  # ${path}/intf/${mydir} -m *.${myext}
 	done
-  done
+#  done
 }
 
 function main() {
@@ -212,9 +217,9 @@ function main() {
 
   [ ! -e "${joborder}" ] && return ${ERR_JOBORDER}
 
-  gmtsar_env ${joborder} || return $?
+  gmtsar_env ${joborder} || return ${ERR_ENV}
 
-  get_dem ${dem_response} || return $?
+  get_dem ${dem_response} || return ${ERR_DEM}
 
   get_aux ${joborder} 
 
@@ -222,10 +227,10 @@ function main() {
 
   ciop-log "INFO" "get_aux ended with ${res}"
 
-  prep_data ${joborder} || return $?
+  prep_data ${joborder} || return ${ERR_PREP_DATA}
 
-  process ${joborder} || return $?
+  process ${joborder} || return ${ERR_PROCESS}
   
-  publish #|| return $?
+  publish #|| return ${ERR_PUBLISH}
 
 }

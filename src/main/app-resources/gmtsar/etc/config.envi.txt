@@ -24,13 +24,13 @@ proc_stage = 1
 #   - pre_proc.csh               #
 ##################################
 # num of patches
-num_patches = 
+num_patches = 0
 
 # earth radius 
-earth_radius = 
+earth_radius = 0
 
 # near_range
-near_range = 
+near_range = 0
 
 # Doppler centroid 
 fd1 = 
