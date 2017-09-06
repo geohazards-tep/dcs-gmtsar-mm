@@ -4,18 +4,34 @@ ERR_ENVISAT_PREP=82
 
 function env_ENVISAT() {
 
-  ciop-log "INFO" "Extending environment for ENVISAT ASAR"
+ ciop-log "INFO" "Updating GMTSAR configuration file"
+
+  local threshold_snaphu=$( ciop-getparam "threshold_snaphu" )
+
+  envi_conf=${TMPDIR}/runtime/config.envi.txt
+
+cat <<EOF > ${envi_conf}
+proc_stage = 1
+num_patches =
+earth_radius =
+near_range =
+fd1 =
+topo_phase = 1
+shift_topo = 0
+switch_master = 0
+filter_wavelength = 300
+dec_factor = 2
+threshold_snaphu = ${threshold_snaphu}
+region_cut =
+switch_land = 1
+defomax = 0
+threshold_geocode = .10
+EOF
  
-#  export OS=$( uname -p )
-#  export GMTHOME=/usr
-#  export NETCDFHOME=/usr
-#  export GMTSARHOME=/usr/local/GMTSAR
-#  export GMTSAR=${GMTSARHOME}/gmtsar
-#  export ENVIPRE=${GMTSARHOME}/ENVISAT_preproc
-#  export PATH=${GMTSAR}/bin:${GMTSAR}/csh:${GMTSARHOME}/preproc/bin:${GMTSARHOME}/ENVISAT_preproc/bin/:${GMTSARHOME}/ENVISAT_preproc/csh:${PATH}
-  
-#  export ENVIPRE=${GMTSARHOME}/ENVISAT_preproc
-#  export PATH=${PATH}:${GMTSARHOME}/ENVISAT_preproc/bin/:${GMTSARHOME}/ENVISAT_preproc/csh
+  ciop-publish -m ${envi_conf}
+
+
+  ciop-log "INFO" "Extending environment for ENVISAT ASAR"
  
   mkdir -p ${TMPDIR}/aux/ENVI/ASA_INS
   mkdir -p ${TMPDIR}/aux/ENVI/Doris
@@ -50,7 +66,9 @@ function get_aux_ENVISAT() {
   # create the list of ASA_INS_AX
   ls ${TMPDIR}/aux/ENVI/ASA_INS/ASA_INS* | sed 's#.*/\(.*\)#\1#g' > ${TMPDIR}/aux/ENVI/ASA_INS/list
   [ ! -e "${TMPDIR}/aux/ENVI/ASA_INS/list" ] && return ${ERR_ENVISAT_AUX} || return 0 
-  
+ 
+  ciop-log "DEBUG" "$( cat ${TMPDIR}/aux/ENVI/ASA_INS/list )"
+   
 }
 
 function prep_data_ENVISAT() {
@@ -89,19 +107,14 @@ function process_ENVISAT() {
 
   series=$( get_series ${joborder} )
   
-  #master_ref=$( get_value ${joborder} "master" )   
-  #slave_ref=$( get_value ${joborder} "slave" )
-  
-  #master_date=$( opensearch-client "${master_ref}" startdate | cut -c 1-10 | tr -d "-" )
-  #slave_date=$( opensearch-client "${slave_ref}" startdate | cut -c 1-10 | tr -d "-" )
-
   ciop-log "INFO" "Process p2p ${series}"
   cd ${TMPDIR}/runtime
+ 
+  p2p_ENVI.csh master slave ${TMPDIR}/runtime/config.envi.txt &> ${TMPDIR}/p2p_ENVISAT.log
+  [ $? -ne 0 ] && return ${ERR_PROCESS}
   
-  csh -x ${_CIOP_APPLICATION_PATH}/gmtsar/libexec/run_envi.csh & #> $TMPDIR/runtime/${series}_${master_date}_${slave_date}.log &
-  wait ${!}	
-
-  # TODO add a check on produced files
+  ciop-log "INFO" "GMT5SAR p2p_ENVI log publication" 
+  ciop-publish -m ${TMPDIR}/p2p_ENVISAT.log
 
 }
 

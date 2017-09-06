@@ -74,6 +74,8 @@ function get_series() {
 function gmtsar_env() {
 
   local joborder=$1
+
+  TMPDIR=/tmp/$( uuidgen )
  
   mkdir -p ${TMPDIR} \
     ${TMPDIR}/runtime/raw \
@@ -232,5 +234,6 @@ function main() {
   process ${joborder} || return ${ERR_PROCESS}
   
   publish #|| return ${ERR_PUBLISH}
-
+ 
+  rm -fr ${TMPDIR}
 }

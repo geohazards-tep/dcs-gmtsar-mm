@@ -113,23 +113,24 @@ function getS1AuxOrbList() {
   for ref in $(echo ${refs} )
 #| grep "POEORB")
   do
-	auxuid=${ref##*/}
-	published=$( opensearch-client "${osd}?uid=${auxuid}" published | cut -d '+' -f1)
-	[ -z "${published}" ] && return ${ERR_AUXPUB}
+  #	auxuid=${ref##*/}
+  #	published=$( opensearch-client "${osd}?uid=${auxuid}" published | cut -d '+' -f1)
+  #	[ -z "${published}" ] && return ${ERR_AUXPUB}
+  #
+#	ciop-log "INFO" "Published data ${published}"
+#
+#	[ -z ${latest} ] && latest=${published}
+#
+#	if [ $( date -d "${published}" +%s ) -ge $( date -d "${latest}" +%s ) ];
+#	then	
+#		latest=${published}
+#		latref=${ref}
+#	fi
+#  done
 
-	ciop-log "INFO" "Published data ${published}"
-
-	[ -z ${latest} ] && latest=${published}
-
-	if [ $( date -d "${published}" +%s ) -ge $( date -d "${latest}" +%s ) ];
-	then	
-		latest=${published}
-		latref=${ref}
-	fi
-  done
-
-  echo -e "${keyword}=${latref}"
-
+  #echo -e "${keyword}=${latref}"
+  echo -e "${keyword}=${ref}"
+done
 }
 
 function getAuxOrbList() {
