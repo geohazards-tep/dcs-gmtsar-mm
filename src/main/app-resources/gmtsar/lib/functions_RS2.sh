@@ -1,35 +1,44 @@
 
 function env_RS2() {
-  ciop-log "INFO" "Nothing to do in env_RADARSAT-2"
+  
+  ciop-log "INFO" "Updating GMTSAR configuration file"
+
+  local threshold_snaphu=$( ciop-getparam "threshold_snaphu" )
+
+  rs2_conf=${TMPDIR}/runtime/config.rs2.txt
+
+cat <<EOF > ${rs2_conf}
+proc_stage = 1
+num_patches =
+earth_radius =
+near_range =
+fd1 =
+topo_phase = 1
+shift_topo = 0
+switch_master = 0
+filter_wavelength = 80
+dec_factor = 1
+threshold_snaphu = ${threshold_snaphu}
+region_cut =
+switch_land = 1
+defomax = 2 
+threshold_geocode = .18
+EOF
+ 
+  ciop-publish -m ${rs2_conf}
+
 }
 
 function get_aux_RS2() {
   ciop-log "INFO" "Nothing to do in get_aux_RADARSAT-2"
 }
 
-function make_slc_RS2() {
-
-  local sar_ref=$1
-  local sar_date
-  local identifier
-
-  sar_date=$( opensearch-client "${sar_ref}" startdate | cut -c 1-10 | tr -d "-" )
-  identifier=$( opensearch-client "${sar_ref}" identifier )
-
-  cd ${TMPDIR}/runtime/raw
-  make_slc_rs2 ${identifier}/product.xml ${identifier}/imagery_HH.tif RS2${sar_date}  
-
-  tree 
-  extend_orbit RS2${sar_date}.LED tmp 3.
-  mv tmp RS2${sar_date}.LED
-  
-}
-
-
 function prep_data_RS2() {
   
   local joborder=$1
-  
+
+  polarization="$( ciop-getparam pol )"
+ 
   master_ref=$( get_value ${joborder} "master" )   
   slave_ref=$( get_value ${joborder} "slave" )   
  
@@ -38,19 +47,32 @@ function prep_data_RS2() {
   slave_or="$( opensearch-client ${slave_ref} enclosure )"
   
   # stage-in the data
-  master=$( ciop-copy -U -O ${TMPDIR}/runtime/raw ${master_or} )
-  slave=$( ciop-copy -U -O ${TMPDIR}/runtime/raw ${slave_or} )
+  master=$( ciop-copy -O ${TMPDIR}/runtime/raw ${master_or} )
+  slave=$( ciop-copy -O ${TMPDIR}/runtime/raw ${slave_or} )
 
-  # extract data
-  tar xvzf ${master}
-  tar xvzf ${slave}
+  master_xml=${master}/$( basename ${master} )/product.xml
+  slave_xml=${slave}/$( basename ${slave} )/product.xml
+
+  master_img=${master}/$( basename ${master} )/imagery_${polarization}.tif
+  slave_img=${slave}/$( basename ${slave} )/imagery_${polarization}.tif
+
+  master_gmtsar=RS2$( basename ${master} | cut -d _ -f 6)
+  slave_gmtsar=RS2$( basename ${slave} | cut -d _ -f 6)
+
+
+  cd ${TMPDIR}/runtime/raw
 
   # pre-process master
-  make_slc_RS2 ${master_ref}
+  make_slc_rs2 ${master_xml} ${master_img} ${master_gmtsar}
   
   # pre-process slave
-  make_slc_RS2 ${slave_ref}
-  
+  make_slc_rs2 ${slave_xml} ${slave_img} ${slave_gmtsar}
+ 
+  extend_orbit ${master_gmtsar}.LED tmp 3.
+  mv tmp ${master_gmtsar}.LED
+  extend_orbit ${slave_gmtsar}.LED tmp 3.
+  mv tmp ${slave_gmtsar}.LED 
+
 }
 
 function process_RS2() {
@@ -68,9 +90,18 @@ function process_RS2() {
   ciop-log "INFO" "Process p2p ${series}"
   
   cd ${TMPDIR}/runtime
+
+  p2p_RS2_SLC.csh RS2${master_date} RS2${slave_date} ${TMPDIR}/runtime/config.rs2.txt &> ${TMPDIR}/p2p_RS2.log
+  [ $? -ne 0 ] && return ${ERR_PROCESS}
   
-  csh ${_CIOP_APPLICATION_PATH}/gmtsar/libexec/run_rs2.csh RS2${master_date} RS2${slave_date}  & #> $TMPDIR/runtime/${series}_${master_date}_${slave_date}.log &
-  wait ${!}
+  ciop-log "INFO" "GMT5SAR p2p_ENVI log publication" 
+  ciop-publish -m ${TMPDIR}/p2p_RS2.log
+
+  for result in $( find ${TMPDIR}/runtime/intf/*/* )
+  do
+    ciop-log "DEBUG" "result: ${result} - ${TMPDIR}/runtime/intf/$( basename ${result} )"
+    mv ${result} ${TMPDIR}/runtime/intf/$( basename ${result} )
+  done
 
 }
 

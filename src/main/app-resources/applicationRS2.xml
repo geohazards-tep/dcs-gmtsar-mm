@@ -26,7 +26,31 @@
     </jobTemplate>
     <jobTemplate id="gmtsar">
       <streamingExecutable>/application/gmtsar/run</streamingExecutable>
-      <defaultParameters/>
+       <defaultParameters>
+        <parameter id="pol" title="Polarization" abstract="Polarization" scope="runtime" maxOccurs="1">
+          <options>
+            <option>HH</option>
+            <option>HV</option>
+            <default>HH</default>
+          </options>
+        </parameter>
+        <parameter id="threshold_snaphu" title="Snaphu threshold" abstract="correlation threshold for snaphu (0~1). Set it to be 0 to skip unwrapping." scope="runtime" maxOccurs="1">
+          <options>
+            <option>0</option>
+            <option>0.1</option>
+            <option>0.2</option>
+            <option>0.3</option>
+            <option>0.4</option>
+            <option>0.5</option>
+            <option>0.6</option>
+            <option>0.7</option>
+            <option>0.8</option>
+            <option>0.9</option>
+            <option>1.0</option>
+            <default>0</default>
+          </options>
+        </parameter>
+      </defaultParameters>   
       <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property> 
         <property id="mapred.task.timeout">7200000</property>   

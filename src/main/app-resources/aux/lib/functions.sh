@@ -152,6 +152,8 @@ function getAuxOrbList() {
     # check for TSX
     [ "$( echo ${identifier} | cut -c 1-3 )" == "TSX" ] && platform="TSX"
 
+    [ "$( echo ${identifier} | cut -c 1-3 )" == "RS2" ] && platform="RS2"
+
   } 
   [ -z "${platform}" ] && return ${ERR_SAR_PLATFORM}
  
@@ -170,7 +172,7 @@ set -x
       aux="$( getS1AuxOrbList ${sar} S1B ${keyword})"
       [ -z "${aux}" ] && return ${ERR_S1B_AUX}
       ;;
-    "RADARSAT-2")
+    "RS2")
       aux=""
       platform="RS2"
     ;;

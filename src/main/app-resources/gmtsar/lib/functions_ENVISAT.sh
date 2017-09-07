@@ -116,6 +116,12 @@ function process_ENVISAT() {
   ciop-log "INFO" "GMT5SAR p2p_ENVI log publication" 
   ciop-publish -m ${TMPDIR}/p2p_ENVISAT.log
 
+  for result in $( find ${TMPDIR}/runtime/intf/*/* )
+  do  
+    ciop-log "DEBUG" "result: ${result} - ${TMPDIR}/runtime/intf/$( basename ${result} )"
+    mv ${result} ${TMPDIR}/runtime/intf/$( basename ${result} )
+  done
+
 }
 
 
