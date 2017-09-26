@@ -63,14 +63,22 @@ function prep_data_RS2() {
   cd ${TMPDIR}/runtime/raw
 
   # pre-process master
-  make_slc_rs2 ${master_xml} ${master_img} ${master_gmtsar}
+  make_slc_rs2 ${master_xml} ${master_img} ${master_gmtsar} 1>&2 
   
   # pre-process slave
-  make_slc_rs2 ${slave_xml} ${slave_img} ${slave_gmtsar}
- 
-  extend_orbit ${master_gmtsar}.LED tmp 3.
+  make_slc_rs2 ${slave_xml} ${slave_img} ${slave_gmtsar} 1>&2 
+
+  tree . 
+
+  cp ${master_gmtsar}.LED ${master_gmtsar}.LED_orig 
+  extend_orbit ${master_gmtsar}.LED tmp 10. 1>&2 
+
+  ciop-log "DEBUG" "exit code $? "
   mv tmp ${master_gmtsar}.LED
-  extend_orbit ${slave_gmtsar}.LED tmp 3.
+
+  cp ${slave_gmtsar}.LED ${slave_gmtsar}.LED_orig
+  extend_orbit ${slave_gmtsar}.LED tmp 10. 1>&2 
+  ciop-log "DEBUG" "exit code $? "
   mv tmp ${slave_gmtsar}.LED 
 
 }
@@ -91,9 +99,9 @@ function process_RS2() {
   
   cd ${TMPDIR}/runtime
 
-  p2p_RS2_SLC.csh RS2${master_date} RS2${slave_date} ${TMPDIR}/runtime/config.rs2.txt &> ${TMPDIR}/p2p_RS2.log
+  p2p_RS2_SLC.csh RS2${master_date} RS2${slave_date} ${TMPDIR}/runtime/config.rs2.txt #&> ${TMPDIR}/p2p_RS2.log
   [ $? -ne 0 ] && return ${ERR_PROCESS}
-  
+  touch ${TMPDIR}/p2p_RS2.log
   ciop-log "INFO" "GMT5SAR p2p_ENVI log publication" 
   ciop-publish -m ${TMPDIR}/p2p_RS2.log
 
