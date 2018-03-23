@@ -26,7 +26,7 @@ pipeline {
         withMaven(
           // Maven installation declared in the Jenkins "Global Tool Configuration"
           maven: 'apache-maven-3.0.5' ) {
-          sh 'mvn -X -e -B deploy -D mission=S1'
+          sh 'mvn -X -e -B deploy -D mission=S1 -Drelease=true'
         }
 
       }
