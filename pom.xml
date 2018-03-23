@@ -46,7 +46,7 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
-                  <mappings combine.children="append" combine.self="override">
+                  <mappings combine.children="append">
                     <mapping>
                       <directory>/application</directory>
                       <sources>
