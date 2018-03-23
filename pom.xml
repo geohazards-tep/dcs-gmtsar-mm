@@ -46,7 +46,7 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
-                  <mappings combine.children="append">
+                  <mappings>
                     <mapping>
                       <directory>/application</directory>
                       <sources>
@@ -58,6 +58,24 @@
                           <destination>application.xml</destination>
                         </softlinkSource>
                       </sources>
+                    </mapping>
+                    <mapping>
+                        <directory>/application</directory>
+                        <sources>
+                            <source>
+                                <location>${basedir}/src/main/app-resources</location>
+                                <includes>
+                                    <include>**/bin/**</include>
+                                    <include>**/run**</include>
+                                    <include>**/*.sh</include>
+                                    <include>**/*.py</include>
+                                    <include>**/*.R</include>
+                                    <include>**/*.exe</include>
+                                    <include>**/*.sav</include>
+                                </includes>
+                            </source>
+                        </sources>
+                        <filemode>755</filemode>
                     </mapping>
                   </mappings>
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
