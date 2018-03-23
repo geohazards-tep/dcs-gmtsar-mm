@@ -63,6 +63,8 @@
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
                   <requires>
                     <require>bash</require>
+                    <require>idl</require>
+                    <require>snap</require>
                     <require>tcsh</require>
                     <require>GMT5SAR</require>
                     <require>lapack</require>
