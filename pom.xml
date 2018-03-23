@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.terradue</groupId>
-  <artifactId>dcs-gmtsar-mm</artifactId>
+  <artifactId>dcs-gmtsar-mm-${mission}</artifactId>
   <packaging>pom</packaging>
   <name>dcs-gmtsar-mm</name>
   <parent>
@@ -11,12 +11,13 @@
     <version>2.0.0</version>
   </parent>
   <description>Developer Cloud Sandbox interferogram processing with GMTSAR Edit</description>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1</version>
   <properties>
     <summary>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</summary>
     <description>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</description>
     <community>geohazards-tep</community>
     <yumRepo>geohazards-tep</yumRepo>
+    <mission/>
   </properties>
   <scm>
     <connection>scm:git:ssh://git@github.com/geohazards-tep/dcs-gmtsar-mm</connection>
@@ -28,10 +29,10 @@
     <profile>
       <id>package-app</id>
       <activation>
-         <property>
-           <name>env</name>
-           <value>ci</value>
-         </property>
+        <property>
+          <name>env</name>
+          <value>ci</value>
+        </property>
       </activation>
       <build>
         <plugins>
@@ -45,10 +46,111 @@
                   <goal>rpm</goal>
                 </goals>
                 <configuration>
+                  <mappings>
+                    <mapping>
+                      <directory>/application</directory>
+                      <sources>
+                        <source>
+                          <location>${basedir}/src/main/app-resources</location>
+                        </source>
+                        <softlinkSource>
+                          <location>application${mission}.xml</location>
+                          <destination>application.xml</destination>
+                        </softlinkSource>
+                      </sources>
+                    </mapping>
+                    <mapping>
+                      <directory>/application</directory>
+                      <sources>
+                        <source>
+                          <location>${basedir}/src/main/app-resources</location>
+                          <includes>
+                            <include>**/bin/**</include>
+                            <include>**/run**</include>
+                            <include>**/*.sh</include>
+                            <include>**/*.py</include>
+                            <include>**/*.R</include>
+                            <include>**/*.exe</include>
+                            <include>**/*.sav</include>
+                          </includes>
+                        </source>
+                      </sources>
+                      <filemode>755</filemode>
+                    </mapping>
+                  </mappings>
                   <!-- Set here the dependencies installed with 'sudo yum install'-->
                   <requires>
                     <require>bash</require>
+                    <require>idl</require>
+                    <require>snap</require>
+                    <require>tcsh</require>
+                    <require>GMT5SAR</require>
+                    <require>lapack</require>
                   </requires>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>install-and-test</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>sandbox</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.6</version>
+            <executions>
+              <execution>
+                <id>copy-app-resources</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>/application</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${basedir}/src/main/app-resources/</directory>
+                      <excludes>
+                        <exclude>**/application*.xml</exclude>
+                      </excludes>
+                    </resource>
+                    <resource>
+                      <directory>${basedir}/src/main/app-resources/</directory>
+                      <includes>
+                        <include>**/application${mission}.xml</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.3.1</version>
+            <executions>
+              <execution>
+                <id>application.xml move</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>cp</executable>
+                  <arguments>
+                    <argument>/application/application${mission}.xml</argument>
+                    <argument>/application/application.xml</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="application">
+  <jobTemplates>
+    <jobTemplate id="aux">
+      <streamingExecutable>/application/aux/run</streamingExecutable>
+      <defaultParameters>
+        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com//noa-terrasar-x/search?uid=TSX1_SAR__SSC______SM_S_SRA_20130621T042929_20130621T042933</parameter>
+      </defaultParameters>
+        <defaultJobconf>
+        <property id="ciop.job.max.tasks">1</property>
+        <property id="mapred.task.timeout">7200000</property>
+      </defaultJobconf>
+    </jobTemplate>
+    <jobTemplate id="dem" jobType="wps_client">
+    <defaultParameters>
+        <parameter id="format">gmtsar</parameter>
+      </defaultParameters>
+      <defaultJobconf>
+        <property id="ogc.wps.access.point">http://dem.terradue.int:8080/wps/WebProcessingService</property>
+        <property id="ogc.wps.process.identifier">com.terradue.wps_oozie.process.OozieAbstractAlgorithm</property>
+        <property id="ogc.wps.storeExecuteResponse">true</property>
+        <property id="ogc.wps.status">true</property>
+        <property id="mapred.task.timeout">9900000000</property>
+        <property id="ciop.job.max.tasks">1</property>
+      </defaultJobconf>
+    </jobTemplate>
+    <jobTemplate id="gmtsar">
+      <streamingExecutable>/application/gmtsar/run</streamingExecutable>
+      <defaultParameters/>
+      <defaultJobconf>
+        <property id="ciop.job.max.tasks">1</property> 
+        <property id="mapred.task.timeout">7200000</property>   
+</defaultJobconf>
+    </jobTemplate>
+  </jobTemplates>
+    <workflow id="gmtsar-mm" title="GMTSAR interferometric processor" abstract="GMTSAR is an open source (GNU General Public License) InSAR processing system. This service provides standard 2-pass processing of a master product against one slave product">
+    <workflowVersion>1.0</workflowVersion>
+    <node id="node_aux">
+      <job id="aux"/>
+      <sources>
+	<source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com//noa-terrasar-x/search?uid=TSX1_SAR__SSC______SM_S_SRA_20130530T042928_20130530T042932</source>
+      </sources>
+      <parameters>
+        <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com//noa-terrasar-x/search?uid=TSX1_SAR__SSC______SM_S_SRA_20130621T042929_20130621T042933</parameter>
+      </parameters>
+    </node>
+    <node id="node_dem">
+      <job id="dem"/>
+      <sources>
+        <source id="Level0_ref" title="Master product catalogue entry in RDF format" abstract="Master product passed by reference to a catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com//noa-terrasar-x/search?uid=TSX1_SAR__SSC______SM_S_SRA_20130621T042929_20130621T042933</source>
+      </sources>
+      <parameters/>
+    </node>
+    <node id="node_gmtsar">
+      <job id="gmtsar"/>
+      <sources>
+        <source refid="wf:node">node_aux</source>
+        <source refid="wf:node">node_dem</source>
+      </sources>
+      <parameters/>
+    </node>
+  </workflow>
+</application>
