@@ -32,40 +32,40 @@ pipeline {
       }
     }
     
-    stage('Package ENVISAT') {
-      steps {
-        
-        withMaven(
-          // Maven installation declared in the Jenkins "Global Tool Configuration"
-          maven: 'apache-maven-3.0.5' ) {
-          sh 'mvn -B deploy -Dmission=ENVISAT'
-        }
+//    stage('Package ENVISAT') {
+ //     steps {
 
-      }
-    }
+ //       withMaven(
+          // Maven installation declared in the Jenkins "Global Tool Configuration"
+   //       maven: 'apache-maven-3.0.5' ) {
+    //      sh 'mvn -B deploy -Dmission=ENVISAT'
+     //   }
+
+ //     }
+ //   }
     
-    stage('Package RS2') {
-      steps {
+ //   stage('Package RS2') {
+ //     steps {
         
-        withMaven(
+  //      withMaven(
           // Maven installation declared in the Jenkins "Global Tool Configuration"
-          maven: 'apache-maven-3.0.5' ) {
-          sh 'mvn -B deploy -Dmission=RS2'
-        }
+    //      maven: 'apache-maven-3.0.5' ) {
+  //        sh 'mvn -B deploy -Dmission=RS2'
+  //      }
 
-      }
-    }
+    //  }
+ //   }
     
-    stage('Package TSX') {
-      steps {
+ //   stage('Package TSX') {
+ //     steps {
         
-        withMaven(
+   //     withMaven(
           // Maven installation declared in the Jenkins "Global Tool Configuration"
-          maven: 'apache-maven-3.0.5' ) {
-          sh 'mvn -B deploy -Dmission=TSX'
-        }
+   //       maven: 'apache-maven-3.0.5' ) {
+     //     sh 'mvn -B deploy -Dmission=TSX'
+    //    }
 
-      }
+   //   }
     }
     
   }
