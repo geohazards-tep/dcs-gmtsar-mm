@@ -2,22 +2,9 @@ def artserver = Artifactory.server('repository.terradue.com')
 def buildInfo = Artifactory.newBuildInfo()
 buildInfo.env.capture = true
 
-pipeline {
+node('ci-community') {
 
-
-  options {
-    // Kepp 5 builds history
-    buildDiscarder(logRotator(numToKeepStr: '5'))
-  }
-
-  agent { 
-    node { 
-      // community builder
-      label 'ci-community' 
-    }
-  }
-
-  stages {
+stages {
 
     // Let's go!
     // stage('Package S1') {
@@ -69,4 +56,6 @@ pipeline {
     //}
     
   }
+
+
 }
