@@ -11,7 +11,7 @@
     <version>3.0.0-docker</version>
   </parent>
   <description>Developer Cloud Sandbox interferogram processing with GMTSAR Edit</description>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
   <properties>
     <summary>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</summary>
     <description>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</description>
