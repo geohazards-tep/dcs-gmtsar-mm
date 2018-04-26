@@ -13,7 +13,7 @@ pipeline {
   agent { 
     node { 
       // community builder
-      label 'ci-community' 
+      label 'ci-community-docker' 
     }
   }
 
