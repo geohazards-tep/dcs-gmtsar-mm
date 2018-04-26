@@ -96,11 +96,11 @@
       </build>
     </profile>
     <profile>
-      <id>package-app</id>
+      <id>install-and-test</id>
       <activation>
         <property>
           <name>env</name>
-          <value>ci</value>
+          <value>sandbox</value>
         </property>
       </activation>
       <build>
