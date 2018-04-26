@@ -92,6 +92,27 @@
               </execution>
             </executions>
           </plugin>
+		  <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.3.1</version>
+            <executions>
+              <execution>
+                <id>application.xml copy</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>cp</executable>
+                  <arguments>
+                    <argument>${basedir}/src/main/app-resources/application${mission}.xml</argument>
+                    <argument>${basedir}/src/main/app-resources/application.xml</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
