@@ -123,8 +123,8 @@ function get_dem() {
   local job_id
   local dem_url
 
-  wf_id=$( echo ${dem_response} | cut -d "/" -f 7 )
-  job_id=$( echo ${dem_response} | cut -d "/" -f 8 )
+  wf_id=$( echo ${dem_response} | cut -d "/" -f 6 )
+  job_id=$( echo ${dem_response} | cut -d "/" -f 7 )
 
   # retrieve the DEM
   dem_url="$( ciop-browseresults -r ${wf_id} -j ${job_id} | tr -d '\n\r' )" 
