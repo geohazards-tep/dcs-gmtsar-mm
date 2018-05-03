@@ -127,7 +127,7 @@ function get_dem() {
   job_id=$( echo ${dem_response} | cut -d "/" -f 7 )
 
   # retrieve the DEM
-  dem_url="$( ciop-browseresults -r ${wf_id} -j ${job_id} | tr -d '\r' | tr -d '\n' |tr -d '\n\r'  )" 
+  dem_url="$( ciop-browseresults -r ${wf_id} -j ${job_id} | tr -d '\r' | tr -d '\n' |tr -d '\n\r'| sed -e 's/%0D//g'  )" 
 
   [ -z "${dem_url}" ] && return ${ERR_DEM}
 
