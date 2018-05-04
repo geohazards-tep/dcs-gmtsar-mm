@@ -87,12 +87,11 @@
                     <require>tcsh</require>
                     <require>GMT5SAR</require>
                     <require>lapack</require>
-					<require>netcdf</require>
-					<require>gdal-t2</require>					
+					<require>netcdf</require>								
 					<require>miniconda</require>
                   </requires>
                   <postinstallScriptlet combine.self="override">
-                    <script>conda update conda -y &amp;&amp; conda install gdal</script>
+                    <script>conda update conda -y &amp;&amp; conda install -y gdal</script>
                   </postinstallScriptlet>
                 </configuration>
               </execution>
