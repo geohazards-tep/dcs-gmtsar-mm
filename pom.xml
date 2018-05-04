@@ -87,6 +87,7 @@
                     <require>tcsh</require>
                     <require>GMT5SAR</require>
                     <require>lapack</require>
+					<require>netcdf</require>					
                   </requires>
                 </configuration>
               </execution>
