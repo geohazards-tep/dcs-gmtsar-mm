@@ -88,6 +88,7 @@
                     <require>GMT5SAR</require>
                     <require>lapack</require>
 					<require>netcdf</require>
+					<require>gdal-t2</require>					
 					<require>miniconda</require>
                   </requires>
                   <postinstallScriptlet combine.self="override">
