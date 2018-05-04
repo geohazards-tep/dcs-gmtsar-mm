@@ -91,7 +91,7 @@
 					<require>miniconda</require>
                   </requires>
                   <postinstallScriptlet combine.self="override">
-                    <script>conda update conda -y &amp;&amp; conda install -y gdal</script>
+                    <script>conda update conda -y &amp;&amp; conda install -y geos=3.5.0=0 libnetcdf gdal</script>
                   </postinstallScriptlet>
                 </configuration>
               </execution>
