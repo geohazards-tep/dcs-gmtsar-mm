@@ -94,6 +94,9 @@ function gmtsar_env() {
   # for gdal
   export PATH=/opt/anaconda/bin:$PATH
 
+  export LIB_PATH=/opt/anaconda/lib:${LIB_PATH}
+  export LD_LIBRARY_PATH=/opt/anaconda/lib:${LD_LIBRARY_PATH}
+
   eval env_${series} ${joborder} || return ${ERR_ENV}
 }
 
