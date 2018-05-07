@@ -89,6 +89,7 @@
                     <require>lapack</require>
 					<require>netcdf</require>								
 					<require>gdal</require>
+					<require>ghostscript</require>					
                   </requires>
                   <!-- <postinstallScriptlet combine.self="override">
                     <script>conda update conda -y &amp;&amp; conda install -y geos=3.5.0=0 libnetcdf gdal</script>
