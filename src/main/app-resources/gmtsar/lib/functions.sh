@@ -18,6 +18,9 @@ source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ALOS2.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_ENVISAT.sh
 source ${_CIOP_APPLICATION_PATH}/gmtsar/lib/functions_RS2.sh
 
+export LIB_PATH=/opt/anaconda/lib:${LIB_PATH}
+export LD_LIBRARY_PATH=/opt/anaconda/lib:${LD_LIBRARY_PATH}
+
 function cleanExit () {
 
   local retval=$?
