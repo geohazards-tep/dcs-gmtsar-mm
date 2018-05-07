@@ -88,11 +88,11 @@
                     <require>GMT5SAR</require>
                     <require>lapack</require>
 					<require>netcdf</require>								
-					<require>miniconda</require>
+					<require>gdal</require>
                   </requires>
-                  <postinstallScriptlet combine.self="override">
+                  <!-- <postinstallScriptlet combine.self="override">
                     <script>conda update conda -y &amp;&amp; conda install -y geos=3.5.0=0 libnetcdf gdal</script>
-                  </postinstallScriptlet>
+                  </postinstallScriptlet> -->
                 </configuration>
               </execution>
             </executions>
