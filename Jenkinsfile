@@ -37,8 +37,9 @@ pipeline {
 
        withMaven(
           //Maven installation declared in the Jenkins "Global Tool Configuration"
-         maven: 'apache-maven-3.0.5' ) {
-         sh 'mvn -B deploy -Dmission=envisat'
+         maven: 'apache-maven-3.0.5' ) {         
+		sh 'mvn clean -Dmission=envisat'
+		 sh 'mvn -B deploy -Dmission=envisat'
        }
 
      }
