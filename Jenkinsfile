@@ -32,18 +32,18 @@ pipeline {
       }
     }
     
-   stage('Package ENVISAT') {
-     steps {
+//    stage('Package ENVISAT') {
+//      steps {
 
-       withMaven(
-          //Maven installation declared in the Jenkins "Global Tool Configuration"
-         maven: 'apache-maven-3.0.5' ) {         
-		sh 'mvn clean -Dmission=envisat'
-		 sh 'mvn -B deploy -Dmission=envisat'
-       }
+//        withMaven(
+//           //Maven installation declared in the Jenkins "Global Tool Configuration"
+//          maven: 'apache-maven-3.0.5' ) {         
+// 		sh 'mvn clean -Dmission=envisat'
+// 		 sh 'mvn -B deploy -Dmission=envisat'
+//        }
 
-     }
-   }
+//      }
+//    }
     
  //   stage('Package RS2') {
  //     steps {
