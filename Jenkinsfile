@@ -32,7 +32,7 @@ pipeline {
       }
      }
     
- 
+ deleteDir()
 
 
  stage('Package ENVISAT') {
