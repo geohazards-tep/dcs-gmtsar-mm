@@ -18,7 +18,7 @@ pipeline {
   }
 
   stages {
-
+	deleteDir()
     // Let's go!
     stage('Package S1') {
       steps {
@@ -36,6 +36,7 @@ pipeline {
 
 
  stage('Package ENVISAT') {
+	 deleteDir()
       steps {
  			
 		cleanWs()
