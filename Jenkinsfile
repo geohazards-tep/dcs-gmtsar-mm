@@ -22,7 +22,7 @@ pipeline {
     // Let's go!
     stage('Package S1') {
       steps {
-        
+         cleanWs()
         withMaven(
           // Maven installation declared in the Jenkins "Global Tool Configuration"
           maven: 'apache-maven-3.0.5' ) {
@@ -32,23 +32,13 @@ pipeline {
       }
      }
     
- stage('Clean WS') {
-      steps {
-
-		  cleanWs()
-        withMaven(
-           //Maven installation declared in the Jenkins "Global Tool Configuration"
-          maven: 'apache-maven-3.0.5' ) {   			        
- 		 sh 'rm -fvR /application/* ; mvn -X -B clean deploy -Dmission=envisat'
-        }
-
-      }
-    }
+ 
 
 
  stage('Package ENVISAT') {
       steps {
-
+ 			
+		cleanWs()
         withMaven(
            //Maven installation declared in the Jenkins "Global Tool Configuration"
           maven: 'apache-maven-3.0.5' ) {   			        
