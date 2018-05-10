@@ -51,13 +51,20 @@
                     <mapping>
                       <directory>/application</directory>
                       <sources>
-                        <source>
+                        <!-- <source>
                           <location>${basedir}/src/main/app-resources</location>
-                        </source>
-                        <softlinkSource>
+                        </source> -->
+                        <!-- <softlinkSource>
                           <location>application${mission}.xml</location>
                           <destination>application.xml</destination>
-                        </softlinkSource>
+                        </softlinkSource> -->
+						
+                        <source>
+                          <location>${basedir}/src/main/app-resources/application${mission}.xml</location>
+						<destination>application.xml</destination>
+                        </source>
+
+
                       </sources>
                     </mapping>
                     <mapping>
