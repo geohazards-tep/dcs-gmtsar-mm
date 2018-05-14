@@ -43,7 +43,7 @@ pipeline {
         withMaven(
           // Maven installation declared in the Jenkins "Global Tool Configuration"
           maven: 'apache-maven-3.0.5' ) {
-          sh 'mvn -X -B deploy -Dmission=s1'
+          sh 'mvn -X -B clean deploy -Dmission=s1'
         }
 
       }
@@ -61,7 +61,7 @@ pipeline {
         withMaven(
            //Maven installation declared in the Jenkins "Global Tool Configuration"
           maven: 'apache-maven-3.0.5' ) {   			        
- 		 sh 'rm -fvR /application/* ; mvn -X -B clean deploy -Dmission=envisat'
+ 		 sh 'mvn -X -B clean deploy -Dmission=envisat'
         }
 
       }
