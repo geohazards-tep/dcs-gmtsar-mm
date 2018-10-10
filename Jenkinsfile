@@ -20,29 +20,29 @@ pipeline {
   stages {
 
     // Let's go!
-    stage('Package S1') {
-      steps {
+    // stage('Package S1') {
+    //   steps {
         
-        withMaven(
-          // Maven installation declared in the Jenkins "Global Tool Configuration"
-          maven: 'apache-maven-3.0.5' ) {
-          sh 'mvn -X -e -B deploy -D mission=S1 -Drelease=true'
-        }
+    //     withMaven(
+    //       // Maven installation declared in the Jenkins "Global Tool Configuration"
+    //       maven: 'apache-maven-3.0.5' ) {
+    //       sh 'mvn -X -e -B deploy -D mission=s1'
+    //     }
 
-      }
-    }
+    //   }
+    // }
     
-//    stage('Package ENVISAT') {
- //     steps {
+   stage('Package ENVISAT') {
+     steps {
 
- //       withMaven(
-          // Maven installation declared in the Jenkins "Global Tool Configuration"
-   //       maven: 'apache-maven-3.0.5' ) {
-    //      sh 'mvn -B deploy -Dmission=ENVISAT'
-     //   }
+       withMaven(
+          //Maven installation declared in the Jenkins "Global Tool Configuration"
+         maven: 'apache-maven-3.0.5' ) {
+         sh 'mvn -X -B clean deploy -Dmission=envisat'
+       }
 
- //     }
- //   }
+     }
+   }
     
  //   stage('Package RS2') {
  //     steps {
