@@ -4,7 +4,7 @@
     <jobTemplate id="aux">
       <streamingExecutable>/application/aux/run</streamingExecutable>
       <defaultParameters>
-        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100328_175019_000000162088_00084_42222_9504.N1</parameter>
+        <parameter id="Level0_ref" title="Reference to master" maxOccurs="1" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100328_175019_000000162088_00084_42222_9504.N1</parameter>
       </defaultParameters>
       <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
@@ -55,7 +55,7 @@
     <node id="node_aux">
       <job id="aux"/>
       <sources>
-        <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100502_175016_000000172089_00084_42723_0354.N1</source>
+        <source id="slave" title="Reference to slave product(s)" maxOccurs="1" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100502_175016_000000172089_00084_42723_0354.N1</source>
       </sources>
       <parameters>
         <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/envisat/search?uid=ASA_IM__0CNPDE20100328_175019_000000162088_00084_42222_9504.N1</parameter>

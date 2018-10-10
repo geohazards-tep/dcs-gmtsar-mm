@@ -4,7 +4,7 @@
     <jobTemplate id="aux">
       <streamingExecutable>/application/aux/run</streamingExecutable>
       <defaultParameters>
-        <parameter id="Level0_ref" title="Reference to master" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170724T041510_20170724T041538_017608_01D766_AB23</parameter>
+        <parameter id="Level0_ref" title="Reference to master" maxOccurs="1" abstract="Reference to master product catalogue entry">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170724T041510_20170724T041538_017608_01D766_AB23</parameter>
       </defaultParameters>
       <defaultJobconf>
         <property id="ciop.job.max.tasks">1</property>
@@ -64,7 +64,7 @@
     <node id="node_aux">
       <job id="aux"/>
       <sources>
-        <source id="slave" title="Reference to slave product(s)" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1B_IW_SLC__1SDV_20170718T041442_20170718T041509_006537_00B7E8_BD0D</source>
+        <source id="slave" title="Reference to slave product(s)" maxOccurs="1" abstract="Reference to slave product(s) catalogue entry" refid="string:list" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1B_IW_SLC__1SDV_20170718T041442_20170718T041509_006537_00B7E8_BD0D</source>
       </sources>
       <parameters>
         <parameter id="Level0_ref" scope="runtime">https://catalog.terradue.com/sentinel1/search?uid=S1A_IW_SLC__1SDV_20170724T041510_20170724T041538_017608_01D766_AB23</parameter>
