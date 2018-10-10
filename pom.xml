@@ -11,7 +11,7 @@
     <version>2.0.0</version>
   </parent>
   <description>Developer Cloud Sandbox interferogram processing with GMTSAR Edit</description>
-  <version>0.4</version>
+  <version>0.5-SNAPSHOT</version>
   <properties>
     <summary>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</summary>
     <description>Developer Cloud Sandbox interferogram processing with GMTSAR Multi Mission</description>
