@@ -59,7 +59,7 @@
       </defaultJobconf>
     </jobTemplate>
   </jobTemplates>
-  <workflow id="gmtsar-mm" title="GMT5SAR InSAR - Stripmap" abstract="GMTSAR is an open source (GNU General Public License) InSAR processing system. This service provides standard 2-pass processing of a master product against one slave product">
+  <workflow id="gmtsar-mm" title="GMT5SAR InSAR - Sentinel-1 TOPSAR" abstract="GMTSAR is an open source (GNU General Public License) InSAR processing system. This service provides standard 2-pass processing of a master product against one slave product">
     <workflowVersion>1.0</workflowVersion>
     <node id="node_aux">
       <job id="aux"/>
